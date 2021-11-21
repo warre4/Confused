@@ -2,6 +2,10 @@
 
 #ifdef CF_PLATFORM_WINDOWS
 
+#ifdef _DEBUG
+	#include <vld.h>
+#endif
+
 extern Confused::Application* Confused::CreateApplication();
 
 int main(int /*argc*/, char** /*argv*/)

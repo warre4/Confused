@@ -3,6 +3,7 @@ module;
 export module Confused.Application;
 
 import <iostream>;
+//import <thread>;
 
 namespace Confused
 {
@@ -15,7 +16,7 @@ namespace Confused
 
 		}
 
-		~Application()
+		virtual ~Application()
 		{
 
 		}
@@ -23,14 +24,21 @@ namespace Confused
 		//
 		void Run()
 		{
-			std::cout << "Confused Engine started running :D\nNOW WITH MODULES! :DDDDDDD (fuck me o_o)\n\n";
-			std::cout << 'R';
+			bool shouldQuit = false;
 
-			while (true)
+			std::cout << "\nConfused Engine started running :D\n\n";
+
+			while (!shouldQuit)
 			{
-				std::cout << 'E';
+				shouldQuit = true;
 			}
+
+			std::cout << "Confused Engine stopped running...\n";
+			std::cin.get();
 		}
+
+	private:
+
 	};
 
 	// Defined in client

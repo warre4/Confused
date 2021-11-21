@@ -57,6 +57,8 @@
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <PublicIncludeDirectories>$(SolutionDir)Confused\src\Confused;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(SolutionDir)Confused\src\Confused</PublicModuleDirectories>
+    <IncludePath>$(SolutionDir)ThirdParty\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -64,6 +66,8 @@
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <PublicIncludeDirectories>$(SolutionDir)Confused\src\Confused;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(SolutionDir)Confused\src\Confused</PublicModuleDirectories>
+    <IncludePath>$(SolutionDir)ThirdParty\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -74,6 +78,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -92,6 +97,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

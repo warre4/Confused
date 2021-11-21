@@ -1,7 +1,8 @@
 #include "Confused.h"
 
-class Sandbox final : public Confused::Application
-{
+APPLICATION_BEGIN(Sandbox)
+//------------------------
+
 public:
 	Sandbox()
 	{
@@ -11,9 +12,9 @@ public:
 	{
 
 	}
-};
 
-Confused::Application* Confused::CreateApplication()
-{
-	return new Sandbox();
-}
+private:
+
+
+//------------------------
+APPLICATION_END(Sandbox)
