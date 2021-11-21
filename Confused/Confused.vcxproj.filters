@@ -18,9 +18,6 @@
     <ClInclude Include="src\Confused\Core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Confused\Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Confused.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -29,7 +26,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Confused\Application.cpp">
+    <ClCompile Include="src\Confused\Application.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

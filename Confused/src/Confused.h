@@ -1,8 +1,7 @@
-#pragma once
 
 // For use by Confused applications
 
-#include "Confused/Application.h"
+import Confused.Application;
 
 //----------Entry Point----------
 #include "Confused/EntryPoint.h"

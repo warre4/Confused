@@ -1,6 +1,6 @@
 #include "Confused.h"
 
-class Sandbox : public Confused::Application
+class Sandbox final : public Confused::Application
 {
 public:
 	Sandbox()
