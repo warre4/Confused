@@ -24,9 +24,15 @@
     <ClInclude Include="src\Confused\EntryPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Confused\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Confused\Application.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Confused\Logger.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,9 +1,9 @@
 module;
 #include "Core.h"
+#include "Logger.h"
 export module Confused.Application;
 
 import <iostream>;
-//import <thread>;
 
 namespace Confused
 {
@@ -26,14 +26,14 @@ namespace Confused
 		{
 			bool shouldQuit = false;
 
-			std::cout << "\nConfused Engine started running :D\n\n";
+			CF_CORE_INFO("Confused Engine started running :D");
 
 			while (!shouldQuit)
 			{
 				shouldQuit = true;
 			}
 
-			std::cout << "Confused Engine stopped running...\n";
+			CF_CORE_INFO("Confused Engine stopped running...");
 			std::cin.get();
 		}
 

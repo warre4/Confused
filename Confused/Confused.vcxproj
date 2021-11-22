@@ -14,9 +14,11 @@
     <ClInclude Include="src\Confused.h" />
     <ClInclude Include="src\Confused\Core.h" />
     <ClInclude Include="src\Confused\EntryPoint.h" />
+    <ClInclude Include="src\Confused\Logger.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Confused\Application.ixx" />
+    <ClCompile Include="src\Confused\Logger.ixx" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -57,8 +59,8 @@
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <PublicIncludeDirectories>$(SolutionDir)Confused\src\Confused;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(SolutionDir)Confused\src\Confused</PublicModuleDirectories>
-    <IncludePath>$(SolutionDir)ThirdParty\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)ThirdParty\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)thirdParty\vld;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -66,8 +68,8 @@
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <PublicIncludeDirectories>$(SolutionDir)Confused\src\Confused;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(SolutionDir)Confused\src\Confused</PublicModuleDirectories>
-    <IncludePath>$(SolutionDir)ThirdParty\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)ThirdParty\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)thirdParty\vld;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -78,7 +80,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)thirdParty\spdlog\include;$(SolutionDir)thirdParty\vld\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -97,7 +99,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)thirdParty\spdlog\include;$(SolutionDir)thirdParty\vld\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
