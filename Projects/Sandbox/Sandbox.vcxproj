@@ -49,7 +49,7 @@
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
     <PublicIncludeDirectories>$(SolutionDir)Confused\src;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)thirdParty\vld;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -81,9 +81,10 @@
     </Link>
     <PostBuildEvent>
       <Command>COPY /Y "$(OutDir)..\$(SolutionName)\$(SolutionName).dll" "$(OutDir)$(SolutionName).dll"</Command>
+      <Command>COPY /Y "$(SolutionDir)thirdParty\vld" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copying Confused.dll to $(ProjectName) build location</Message>
+      <Message>Copying dlls to $(ProjectName) build location</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
