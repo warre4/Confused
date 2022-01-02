@@ -22,7 +22,7 @@ namespace Confused
 		}
 
 		//
-		void Run()
+		virtual void Run()
 		{
 			bool shouldQuit = false;
 

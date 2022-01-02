@@ -80,10 +80,11 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>COPY /Y "$(OutDir)..\$(SolutionName)\$(SolutionName).dll" "$(OutDir)$(SolutionName).dll"</Command>
+      <Command>$(SolutionDir)PostBuild.bat $(Configuration) $(SolutionDir) $(OutDir) $(SolutionName)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copying Confused.dll to $(ProjectName) build location</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -109,10 +110,11 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>COPY /Y "$(OutDir)..\$(SolutionName)\$(SolutionName).dll" "$(OutDir)$(SolutionName).dll"</Command>
+      <Command>$(SolutionDir)PostBuild.bat $(Configuration) $(SolutionDir) $(OutDir) $(SolutionName)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copying Confused.dll to $(ProjectName) build location</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
