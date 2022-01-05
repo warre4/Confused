@@ -1,4 +1,6 @@
 #pragma once
+#include "spdlog/spdlog.h"
+#include <memory>
 import Confused.Logger;
 
 // Core logging

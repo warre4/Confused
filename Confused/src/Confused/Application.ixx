@@ -1,9 +1,8 @@
 module;
 #include "Core.h"
 #include "Logger.h"
+#include <iostream>
 export module Confused.Application;
-
-import <iostream>;
 
 namespace Confused
 {
@@ -22,23 +21,14 @@ namespace Confused
 		}
 
 		//
-		virtual void Run()
-		{
-			bool shouldQuit = false;
-
-			CF_CORE_INFO("Confused Engine started running :D");
-
-			while (!shouldQuit)
-			{
-				shouldQuit = true;
-			}
-
-			CF_CORE_INFO("Confused Engine stopped running...");
-			std::cin.get();
-		}
+		virtual void Initialize() = 0;
+		virtual void Cleanup() = 0;
+		
+		void Run();
 
 	private:
-
+		void InitializeCore();
+		void CleanupCore();
 	};
 
 	// Defined in client

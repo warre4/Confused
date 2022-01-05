@@ -2,6 +2,7 @@ module;
 #include "Core.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include <memory>
 export module Confused.Logger;
 
 namespace Confused
@@ -19,10 +20,6 @@ namespace Confused
 			m_pClientLogger = spdlog::stdout_color_mt("APP");
 			m_pClientLogger->set_level(spdlog::level::trace);
 		}
-		static void Cleanup()
-		{
-
-		}
 
 		inline static const std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_pCoreLogger; }
 		inline static const std::shared_ptr<spdlog::logger>& GetClientLogger() { return m_pClientLogger; }
@@ -32,6 +29,6 @@ namespace Confused
 		static std::shared_ptr<spdlog::logger> m_pClientLogger;
 	};
 
-	std::shared_ptr<spdlog::logger> Logger::m_pCoreLogger;
-	std::shared_ptr<spdlog::logger> Logger::m_pClientLogger;
+	std::shared_ptr<spdlog::logger> Logger::m_pCoreLogger = nullptr;
+	std::shared_ptr<spdlog::logger> Logger::m_pClientLogger = nullptr;
 }

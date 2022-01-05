@@ -15,9 +15,6 @@ int main(int /*argc*/, char** /*argv*/)
 	{
 #endif
 
-	Confused::Logger::Initialize();
-	CF_CORE_INFO("Initialized Logger!");
-
 	Confused::Application* pApplication = Confused::CreateApplication();
 
 	pApplication->Run();

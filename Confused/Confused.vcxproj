@@ -17,8 +17,11 @@
     <ClInclude Include="src\Confused\Logger.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Confused\Application.cpp" />
     <ClCompile Include="src\Confused\Application.ixx" />
     <ClCompile Include="src\Confused\Logger.ixx" />
+    <ClCompile Include="src\Confused\Singleton.ixx" />
+    <ClCompile Include="src\Confused\Time.ixx" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
