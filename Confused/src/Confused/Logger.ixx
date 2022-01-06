@@ -14,10 +14,10 @@ namespace Confused
 		{
 			spdlog::set_pattern("%^[%T] %n: %v%$");
 
-			m_pCoreLogger = spdlog::stdout_color_mt("CF");
+			m_pCoreLogger = spdlog::stdout_color_mt("Confused");
 			m_pCoreLogger->set_level(spdlog::level::trace);
 
-			m_pClientLogger = spdlog::stdout_color_mt("APP");
+			m_pClientLogger = spdlog::stdout_color_mt("App");
 			m_pClientLogger->set_level(spdlog::level::trace);
 		}
 

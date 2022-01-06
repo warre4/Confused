@@ -1,7 +1,7 @@
 #pragma once
 
 // For use by Confused applications
-#include "Confused/Logger.h" // import + macro definitions
+#include "Confused/Macros.h" // import + macro definitions
 
 import Confused.Application;
 

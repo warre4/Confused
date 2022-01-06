@@ -1,4 +1,5 @@
-#include "Logger.h"
+#include "Macros.h"
+
 #include <string>
 #include <iostream>
 #include <chrono>
@@ -9,22 +10,22 @@
 import Confused.Application;
 import Confused.Singleton;
 import Confused.Time;
+import Confused.Renderer;
 
 void Confused::Application::InitializeCore()
 {
-	Confused::Logger::Initialize();
-	CF_CORE_INFO("Initializing Confused Engine");
+	Logger::Initialize();
+	Renderer::GetInstance().Initialize();
 
-
+	CORE_LOGD("Engine started");
 }
 
 void Confused::Application::CleanupCore()
 {
-	CF_CORE_INFO("Cleaning up Confused");
+	Renderer::GetInstance().Cleanup();
 
-
-
-	CF_CORE_TRACE("Program stopped running, press any button to quit...");
+	CORE_LOGD("Engine exitted");
+	CORE_LOGT("Program stopped running, press enter to quit...");
 	std::cin.get();
 }
 
@@ -35,8 +36,8 @@ void Confused::Application::Run()
 	Initialize();
 
 	auto& time = Time::GetInstance();
+	auto& renderer = Renderer::GetInstance();
 
-	// Loop
 	bool shouldContinue = true;
 	auto lastTime = time.GetCurrent();
 	auto currentTime = lastTime;
@@ -44,11 +45,12 @@ void Confused::Application::Run()
 
 	// Inputs
 	std::future<void> inputs = std::async(std::launch::async, []() {
-		CF_CORE_INFO("Inputs initialized, press anything to stop the engine...");
+		CORE_LOGI("Inputs initialized, press enter to stop the engine...");
 		std::cin.get();
-		CF_CORE_INFO("Input received! Confused Engine exitting...");
+		CORE_LOGT("Input received!");
 		});
 
+	// Loop
 	while (shouldContinue)
 	{
 		currentTime = time.GetCurrent();
@@ -62,9 +64,9 @@ void Confused::Application::Run()
 			shouldContinue = false;
 
 		// Render
+		renderer.Render();
 
-
-		CF_CORE_TRACE("FPS: " + std::to_string(int(1.f / deltaTime)));
+		//CORE_LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
 	}
 
 	// Cleanup

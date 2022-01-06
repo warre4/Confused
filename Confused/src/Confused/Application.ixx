@@ -1,7 +1,6 @@
 module;
 #include "Core.h"
-#include "Logger.h"
-#include <iostream>
+#include "Macros.h"
 export module Confused.Application;
 
 namespace Confused
@@ -19,12 +18,12 @@ namespace Confused
 		{
 
 		}
-
-		//
-		virtual void Initialize() = 0;
-		virtual void Cleanup() = 0;
 		
 		void Run();
+
+	protected:
+		virtual void Initialize() = 0;
+		virtual void Cleanup() = 0;
 
 	private:
 		void InitializeCore();

@@ -1,7 +1,5 @@
 #include "Confused.h"
 
-#include <iostream>
-
 APPLICATION_BEGIN(Sandbox)
 //------------------------
 
@@ -15,18 +13,18 @@ public:
 
 	}
 
+private:
 	void Initialize() override
 	{
-		CF_INFO("Initializing Sandbox");
+		LOGT("Sandbox initializing");
 	}
 
 	void Cleanup() override
 	{
-		CF_INFO("Cleaning up Sandbox");
+		LOGT("Sandbox cleaning up");
 	}
-
-private:
-
 
 //------------------------
 APPLICATION_END(Sandbox)
+
+// Helper functions
