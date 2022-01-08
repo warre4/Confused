@@ -1,8 +1,8 @@
 module;
-#include "Core.h"
 #include "Macros.h"
-import Confused.Singleton;
 export module Confused.Renderer;
+
+import Confused.Singleton;
 
 namespace Confused
 {
@@ -16,7 +16,7 @@ namespace Confused
 		{
 			CORE_LOGT("Renderer initializing");
 
-
+			CORE_LOGD("OoOoOoOoH VuLkAn o_o");
 		}
 		void Cleanup()
 		{

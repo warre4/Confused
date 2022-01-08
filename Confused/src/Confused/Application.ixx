@@ -1,5 +1,4 @@
 module;
-#include "Core.h"
 #include "Macros.h"
 export module Confused.Application;
 

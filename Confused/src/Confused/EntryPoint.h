@@ -2,7 +2,6 @@
 
 #ifdef CF_PLATFORM_WINDOWS
 
-#include <iostream>
 #ifdef _DEBUG
 	#include <vld/vld.h>
 #endif

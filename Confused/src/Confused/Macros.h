@@ -1,11 +1,10 @@
 #pragma once
 
+#pragma warning( push )
+#pragma warning( disable : 4251 ) // Since this is just for logging, we can ignore this warning
 
-#include "spdlog/spdlog.h"
-#include <memory>
+#include "Logger.h"
 #include <exception>
-
-import Confused.Logger;
 
 // ----------------------------------------------------------------------------------------------
 // LOGGING
@@ -35,6 +34,8 @@ import Confused.Logger;
 #define LOGWARNING(...)  Confused::Logger::GetClientLogger()->warn(__VA_ARGS__)
 #define LOGERROR(...)    Confused::Logger::GetClientLogger()->error(__VA_ARGS__)
 #define LOGCRITICAL(...) Confused::Logger::GetClientLogger()->critical(__VA_ARGS__)
+
+#pragma warning( pop )
 
 
 // ----------------------------------------------------------------------------------------------

@@ -2,9 +2,9 @@
 
 WORK IN PROGRESS!
 
-Confused Engine is a 3D engine made in C++ using Vulkan and SDL.
+Confused Engine is a 3D engine made in C++ using Vulkan.
 I have started making a [2D engine](https://gitlab.com/warre.engels/budgety "Budgety") before but I am starting over and making a 3D engine.
-This engine will work with an Entity Compoment System because it's simply superior to anything else 🙃.
+I will try to make this engine work with an event based system.
 
 
 

@@ -14,12 +14,13 @@
     <ClInclude Include="src\Confused.h" />
     <ClInclude Include="src\Confused\Core.h" />
     <ClInclude Include="src\Confused\EntryPoint.h" />
+    <ClInclude Include="src\Confused\Logger.h" />
     <ClInclude Include="src\Confused\Macros.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Confused\Application.cpp" />
     <ClCompile Include="src\Confused\Application.ixx" />
-    <ClCompile Include="src\Confused\Logger.ixx" />
+    <ClCompile Include="src\Confused\Logger.cpp" />
     <ClCompile Include="src\Confused\Renderer.ixx" />
     <ClCompile Include="src\Confused\Singleton.ixx" />
     <ClCompile Include="src\Confused\Time.ixx" />

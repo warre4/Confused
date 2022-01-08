@@ -2,9 +2,10 @@ module;
 #include "Core.h"
 #include <chrono>
 #include <iostream>
+export module Confused.Time;
+
 import Confused.Application;
 import Confused.Singleton;
-export module Confused.Time;
 
 using namespace std::chrono;
 

@@ -17,14 +17,14 @@ void Confused::Application::InitializeCore()
 	Logger::Initialize();
 	Renderer::GetInstance().Initialize();
 
-	CORE_LOGD("Engine started");
+	CORE_LOGT("Engine started");
 }
 
 void Confused::Application::CleanupCore()
 {
 	Renderer::GetInstance().Cleanup();
 
-	CORE_LOGD("Engine exitted");
+	CORE_LOGT("Engine exitted");
 	CORE_LOGT("Program stopped running, press enter to quit...");
 	std::cin.get();
 }
@@ -45,7 +45,7 @@ void Confused::Application::Run()
 
 	// Inputs
 	std::future<void> inputs = std::async(std::launch::async, []() {
-		CORE_LOGI("Inputs initialized, press enter to stop the engine...");
+		CORE_LOGT("Inputs initialized, press enter to stop the engine...");
 		std::cin.get();
 		CORE_LOGT("Input received!");
 		});
