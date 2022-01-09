@@ -19,3 +19,7 @@ copy /y %OutDir%..\%EngineName%\%EngineName%.dll %OutDir%%EngineName%.dll
 
 rem Third party files
 if !%Configuration%! == !Debug! copy /y %ThirdPartyDir%vld\* %OutDir%
+
+copy /y %ThirdPartyDir%SDL2\lib\* %OutDir%
+copy /y %ThirdPartyDir%glfw-3.3.6\lib\* %OutDir%
+copy /y %ThirdPartyDir%vulkan\* %OutDir%

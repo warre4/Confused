@@ -69,7 +69,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)Confused\src;$(SolutionDir)thirdParty\vld\include;$(SolutionDir)thirdParty\spdlog\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Confused\src;$(SolutionDir)thirdParty\vld\include;$(SolutionDir)thirdParty\spdlog\include;$(SolutionDir)thirdParty\glfw-3.3.6\include;$(SolutionDir)thirdParty\glm;$(SolutionDir)thirdParty\SDL2\include;$(SolutionDir)thirdParty\vulkan</AdditionalIncludeDirectories>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
       <EnableModules>true</EnableModules>
     </ClCompile>
@@ -97,7 +97,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)Confused\src;$(SolutionDir)thirdParty\vld\include;$(SolutionDir)thirdParty\spdlog\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Confused\src;$(SolutionDir)thirdParty\vld\include;$(SolutionDir)thirdParty\spdlog\include;$(SolutionDir)thirdParty\glfw-3.3.6\include;$(SolutionDir)thirdParty\glm;$(SolutionDir)thirdParty\SDL2\include;$(SolutionDir)thirdParty\vulkan</AdditionalIncludeDirectories>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
       <EnableModules>true</EnableModules>
     </ClCompile>

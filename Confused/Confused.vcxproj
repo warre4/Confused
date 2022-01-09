@@ -85,12 +85,12 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
-      <AdditionalIncludeDirectories>$(SolutionDir)thirdParty\spdlog\include;$(SolutionDir)thirdParty\vld\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)thirdParty\spdlog\include;$(SolutionDir)thirdParty\vld\include;$(SolutionDir)thirdParty\glfw-3.3.6\include;$(SolutionDir)thirdParty\glm;$(SolutionDir)thirdParty\SDL2\include;$(SolutionDir)thirdParty\vulkan;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)thirdParty\vulkan\vulkan-1.lib;$(SolutionDir)thirdParty\glfw-3.3.6\lib\glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -104,14 +104,14 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalModuleDependencies>%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
-      <AdditionalIncludeDirectories>$(SolutionDir)thirdParty\spdlog\include;$(SolutionDir)thirdParty\vld\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)thirdParty\spdlog\include;$(SolutionDir)thirdParty\vld\include;$(SolutionDir)thirdParty\glfw-3.3.6\include;$(SolutionDir)thirdParty\glm;$(SolutionDir)thirdParty\SDL2\include;$(SolutionDir)thirdParty\vulkan;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)thirdParty\vulkan\vulkan-1.lib;$(SolutionDir)thirdParty\glfw-3.3.6\lib\glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
