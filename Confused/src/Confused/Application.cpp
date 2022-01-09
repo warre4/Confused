@@ -1,3 +1,5 @@
+#pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
+
 #include "Macros.h"
 
 #include <string>
@@ -11,11 +13,13 @@ import Confused.Application;
 import Confused.Singleton;
 import Confused.Time;
 import Confused.Renderer;
+import Confused.Window;
 
 void Confused::Application::InitializeCore()
 {
 	Logger::Initialize();
-	Renderer::GetInstance().Initialize();
+	m_pMainWindow = new Window(m_Name, 800, 600);
+	Renderer::GetInstance().Initialize(m_pMainWindow);
 
 	CORE_LOGT("Engine started");
 }
@@ -23,6 +27,7 @@ void Confused::Application::InitializeCore()
 void Confused::Application::CleanupCore()
 {
 	Renderer::GetInstance().Cleanup();
+	delete m_pMainWindow;
 
 	CORE_LOGT("Engine exitted");
 	CORE_LOGT("Program stopped running, press enter to quit...");
@@ -43,12 +48,12 @@ void Confused::Application::Run()
 	auto currentTime = lastTime;
 	float deltaTime = 0.f;
 
-	// Inputs
-	std::future<void> inputs = std::async(std::launch::async, []() {
-		CORE_LOGT("Inputs initialized, press enter to stop the engine...");
-		std::cin.get();
-		CORE_LOGT("Input received!");
-		});
+	//// Inputs
+	//std::future<void> inputs = std::async(std::launch::async, []() {
+	//	CORE_LOGT("Inputs initialized, press enter to stop the engine...");
+	//	std::cin.get();
+	//	CORE_LOGT("Input received!");
+	//	});
 
 	// Loop
 	while (shouldContinue)
@@ -60,13 +65,12 @@ void Confused::Application::Run()
 		time.SetElapsed(deltaTime);
 
 		// Update
-		if (inputs._Is_ready())
-			shouldContinue = false;
+		shouldContinue = !m_pMainWindow->Update();
 
 		// Render
 		renderer.Render();
 
-		//CORE_LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
+		CORE_LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
 	}
 
 	// Cleanup

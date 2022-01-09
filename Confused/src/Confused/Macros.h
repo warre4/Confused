@@ -4,7 +4,8 @@
 #pragma warning( disable : 4251 ) // Since this is just for logging, we can ignore this warning
 
 #include "Logger.h"
-#include <exception>
+#include <string>
+#include <stdexcept>
 
 // ----------------------------------------------------------------------------------------------
 // LOGGING

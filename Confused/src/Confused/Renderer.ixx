@@ -8,11 +8,12 @@ module;
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
-
-#include <iostream>
 export module Confused.Renderer;
 
 import Confused.Singleton;
+import Confused.Window;
+
+#pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
 
 namespace Confused
 {
@@ -22,37 +23,12 @@ namespace Confused
 		Renderer() = default;
 		~Renderer() = default;
 
-		void Initialize()
+		void Initialize(Window* pWindow)
 		{
+			SetWindow(pWindow);
 			CORE_LOGT("Renderer initializing");
 
-			// ----------------------------------------------------------------------------------------
-			// TEMPORARY (to test Vulkan)
-			// ----------------------------------------------------------------------------------------
-			glfwInit();
 
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-			GLFWwindow* window = glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-
-			uint32_t extensionCount = 0;
-			vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-
-			std::cout << extensionCount << " extensions supported\n";
-
-			glm::mat4 matrix;
-			glm::vec4 vec;
-			auto test = matrix * vec;
-
-			while (!glfwWindowShouldClose(window)) {
-				glfwPollEvents();
-			}
-
-			glfwDestroyWindow(window);
-
-			glfwTerminate();
-			// ----------------------------------------------------------------------------------------
-			// TEMPORARY (to test Vulkan)
-			// ----------------------------------------------------------------------------------------
 		}
 		void Cleanup()
 		{
@@ -66,10 +42,16 @@ namespace Confused
 
 		}
 
+		// Getters & Setters
+		inline void SetWindow(Window* pWindow) { m_pWindow = pWindow; }
+
 		// Helpers
 
 
 	private:
 
+
+		// Variables
+		Window* m_pWindow;
 	};
 }

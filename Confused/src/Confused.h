@@ -1,5 +1,7 @@
 #pragma once
 
+#pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
+
 // For use by Confused applications
 #include "Confused/Macros.h"
 

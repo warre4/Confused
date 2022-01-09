@@ -5,6 +5,7 @@ APPLICATION_BEGIN(Sandbox)
 
 public:
 	Sandbox()
+		: Confused::Application("Sandbox")
 	{
 
 	}
@@ -16,12 +17,12 @@ public:
 private:
 	void Initialize() override
 	{
-		LOGT("Sandbox initializing");
+		LOGT(GetName() + " initializing");
 	}
 
 	void Cleanup() override
 	{
-		LOGT("Sandbox cleaning up");
+		LOGT(GetName() + " cleaning up");
 	}
 
 //------------------------

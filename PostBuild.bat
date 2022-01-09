@@ -15,7 +15,7 @@ echo EngineName: %EngineName%
 rem Copy nessecary files to the output directory
 
 rem Engine .dll
-copy /y %OutDir%..\%EngineName%\%EngineName%.dll %OutDir%%EngineName%.dll
+copy /y %OutDir%..\%EngineName%\* %OutDir%
 
 rem Third party files
 if !%Configuration%! == !Debug! copy /y %ThirdPartyDir%vld\* %OutDir%

@@ -6,6 +6,9 @@
 	#include <vld/vld.h>
 #endif
 
+#include <stdexcept>
+#include <cstdlib>
+
 extern Confused::Application* Confused::CreateApplication();
 
 int main(int /*argc*/, char** /*argv*/)
@@ -28,14 +31,16 @@ int main(int /*argc*/, char** /*argv*/)
 	{
 		int msgboxID = MessageBoxA(NULL, e.what(), "Exception", MB_ICONERROR | MB_OK);
 		if (msgboxID == IDOK)
-			return 0;
+			return EXIT_FAILURE;
 	}
 	catch (...)
 	{
 		int msgboxID = MessageBoxA(NULL, "Exception of an undetermined type", "Exception", MB_ICONERROR | MB_OK);
 		if (msgboxID == IDOK)
-			return 0;
+			return EXIT_FAILURE;
 	}
+
+	return EXIT_SUCCESS;
 #endif
 }
 
