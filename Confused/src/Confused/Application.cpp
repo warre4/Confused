@@ -70,7 +70,7 @@ void Confused::Application::Run()
 		// Render
 		renderer.Render();
 
-		CORE_LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
+		//CORE_LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
 	}
 
 	// Cleanup

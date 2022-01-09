@@ -43,6 +43,7 @@
 // EXCEPTIONS
 // ----------------------------------------------------------------------------------------------
 #define CORE_EXCEPTION(message) throw std::exception((std::string("Confused: ") + message).c_str())
+#define CORE_EXCEPTION_VKRES(message, vkResult) throw std::runtime_error((std::string("Confused: ") + message + " \nError code: " + std::to_string((int)vkResult)).c_str())
 
 #define EXCEPTION(message) throw std::exception((std::string("App: ") + message).c_str())
 
