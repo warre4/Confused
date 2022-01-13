@@ -9,68 +9,66 @@ export module Confused.Window;
 
 namespace Confused
 {
+	export struct CONFUSED_API WindowProps final
+	{
+		std::string Title;
+		uint32_t Width;
+		uint32_t Height;
+		bool IsResizable;
+
+		WindowProps(const std::string& title = "Confused Engine", uint32_t width = 1600, uint32_t height = 900, bool isResizable = false)
+			: Title{ title }
+			, Width{ width }
+			, Height{ height }
+			, IsResizable{ isResizable }
+		{
+		}
+	};
+
 	export class CONFUSED_API Window final
 	{
 	public:
-		Window(const std::string& appName, uint32_t width, uint32_t height/*, bool isResizable = false*/)
-			: m_AppName{ appName }
-			, m_Width{ width }
-			, m_Height{ height }
-			, m_Title{ appName + " | " + std::to_string(width) + " x " + std::to_string(height) }
+		Window(const WindowProps& props)
+			: m_Props{ props }
 		{
-			m_WindowCounter++;
-			if (m_WindowCounter > 1)
-				CORE_EXCEPTION("A maximum of 1 window is supported");
-
-			// Initialize
-			glfwInit();
-
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-			glfwWindowHint(GLFW_RESIZABLE, false);
-
 			// Create window
-			m_pWindow = glfwCreateWindow(width, height, m_Title.c_str(), nullptr, nullptr);
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+			glfwWindowHint(GLFW_RESIZABLE, props.IsResizable);
+
+			m_pWindow = glfwCreateWindow(props.Width, props.Height, props.Title.c_str(), nullptr, nullptr);
 		}
+
 		~Window()
 		{
 			// Destroy window
 			glfwDestroyWindow(m_pWindow);
-
-			// Cleanup
-			glfwTerminate();
 		}
 
-		// returns true if window should close
-		bool Update()
+		void Update()
 		{
 			glfwPollEvents();
-
-			return glfwWindowShouldClose(m_pWindow);
 		}
 
 		// Getters & Setters
+
+		inline bool GetShouldClose() const { return glfwWindowShouldClose(m_pWindow); }
+
 		inline GLFWwindow* GetWindow() const { return m_pWindow; }
-		inline uint32_t GetWidth() const { return m_Width; }
-		inline uint32_t GetHeight() const { return m_Height; }
-		inline const std::string& GetTitle() const { return m_Title; }
+		inline uint32_t GetWidth() const { return m_Props.Width; }
+		inline uint32_t GetHeight() const { return m_Props.Height; }
+		inline const std::string& GetTitle() const { return m_Props.Title; }
+		inline const WindowProps& GetProperties() const { return m_Props; }
 
 		void SetTitle(const std::string& title)
 		{
-			m_Title = title;
+			m_Props.Title = title;
 			glfwSetWindowTitle(m_pWindow, title.c_str());
 		}
 
 	private:
 		// Variables
+
 		GLFWwindow* m_pWindow;
-		std::string m_AppName;
-		std::string m_Title;
-		uint32_t m_Width;
-		uint32_t m_Height;
-
-		// Static Variables
-		static int m_WindowCounter;
+		WindowProps m_Props;
 	};
-
-	int Confused::Window::m_WindowCounter = 0;
 }

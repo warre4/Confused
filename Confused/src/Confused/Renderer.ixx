@@ -2,6 +2,7 @@ module;
 #include "Macros.h"
 
 #include <vector>
+#include <algorithm>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -14,6 +15,7 @@ export module Confused.Renderer;
 
 import Confused.Singleton;
 import Confused.Window;
+import Confused.Utils;
 
 #pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
 
@@ -47,6 +49,7 @@ namespace Confused
 		}
 
 		// Getters & Setters
+
 		inline Window* GetWindow() { return m_pWindow; }
 
 		inline void SetWindow(Window* pWindow) { m_pWindow = pWindow; }
@@ -56,6 +59,13 @@ namespace Confused
 
 		void CreateInstance()
 		{
+			// Validation layers
+			if (m_EnableValidationLayers)
+			{
+				PrintStrings(m_ValidationLayers, "Required validation layers");
+				CheckValidationLayerSupport();
+			}
+
 			// Application Info
 			VkApplicationInfo appInfo{};
 			appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -88,40 +98,112 @@ namespace Confused
 			if (result != VK_SUCCESS)
 				CORE_EXCEPTION_VKRES("vkCreateInstance failed", result);
 			
-			// Print Info
-			PrintRequiredInstanceExtensions(glfwExtensions, glfwExtensionCount);
-			PrintExtensionPropertiesInfo();
+			// Check and print extensions
+			std::vector<std::string> requiredExtensions = UTILS.ToVec<std::string>(glfwExtensions, glfwExtensionCount);
+			std::vector<std::string> supportedExtensions = GetSupportedExtensions();
+
+			PrintStrings(requiredExtensions, "Required extensions");
+			//PrintStrings(supportedExtensions, "Supported extensions");
+
+			CheckExtentionSupport(supportedExtensions, requiredExtensions);
 		}
 
-		void PrintRequiredInstanceExtensions(const char** arr, uint32_t count)
-		{
-			CORE_LOGD("");
-
-			CORE_LOGD("Required instance extensions(" + std::to_string(count) + "):");
-			for (uint32_t i = 0; i < count; i++)
-				CORE_LOGD(std::string("\t") + arr[i]);
-
-			CORE_LOGD("");
-		}
-
-		void PrintExtensionPropertiesInfo()
+#pragma region VkExtensionInfo
+		std::vector<std::string> GetSupportedExtensions()
 		{
 			uint32_t extensionCount = 0;
 			vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-			std::vector<VkExtensionProperties> extensions(extensionCount);
+			std::vector<VkExtensionProperties> extensions{ extensionCount };
 			vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
+			std::vector<std::string> supportedExtensions{ extensionCount };
+
+			for (uint32_t i = 0; i < extensionCount; i++)
+			{
+				supportedExtensions[i] = extensions[i].extensionName;
+			}
+
+			return std::move(supportedExtensions);
+		}
+
+		void CheckExtentionSupport(const std::vector<std::string>& supportedExtensions, const std::vector<std::string>& requiredExtensions) const
+		{
+			bool isEverythingSupported = true;
+			for (const std::string& requiredExt : requiredExtensions)
+			{
+				if (std::find(supportedExtensions.cbegin(), supportedExtensions.cend(), requiredExt) == supportedExtensions.cend())
+				{
+					isEverythingSupported = false;
+					CORE_LOGERROR("Extension not supported: " + requiredExt);
+				}
+			}
+
+			if (isEverythingSupported)
+				CORE_LOGI("All required extensions are supported");
+			else
+				CORE_LOGCRITICAL("Not all required extentions are supported");
+		}
+#pragma endregion VkExtensionInfo
+
+#pragma region VkValidationLayers
+		void CheckValidationLayerSupport() const
+		{
+			uint32_t layerCount;
+			vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+			std::vector<VkLayerProperties> availableLayers(layerCount);
+			vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+			bool isEverythingSupported = true;
+
+			for (const std::string& layerName : m_ValidationLayers)
+			{
+				bool layerFound = false;
+
+				for (const auto& layerProperties : availableLayers)
+				{
+					if (strcmp(layerName.c_str(), layerProperties.layerName) == 0)
+					{
+						layerFound = true;
+						break;
+					}
+				}
+
+				if (!layerFound)
+				{
+					isEverythingSupported = false;
+					CORE_LOGERROR("Validation layer not supported: " + std::string(layerName));
+				}
+			}
+
+			if (isEverythingSupported)
+				CORE_LOGI("All required validation layers are supported");
+			else
+				CORE_LOGCRITICAL("Not all required validation layers are supported");
+		}
+#pragma endregion VkValidationLayers
+
+		void PrintStrings(const std::vector<std::string>& vec, const std::string& description) const
+		{
 			CORE_LOGD("");
 
-			CORE_LOGD("Available extensions(" + std::to_string(extensionCount) + "):");
-			for (const auto& extension : extensions)
-				CORE_LOGD(std::string("\t") + extension.extensionName);
+			CORE_LOGD(description + "(" + std::to_string(vec.size()) + "):");
+			for (const std::string& element : vec)
+				CORE_LOGD("\t" + element);
 
 			CORE_LOGD("");
 		}
 
 		// Variables
+
 		Window* m_pWindow;
 		VkInstance m_VkInstance;
+
+#ifdef NDEBUG
+		const bool m_EnableValidationLayers = false;
+#else
+		const bool m_EnableValidationLayers = true;
+#endif
+		const std::vector<std::string> m_ValidationLayers = { "VK_LAYER_KHRONOS_validation" };
 	};
 }

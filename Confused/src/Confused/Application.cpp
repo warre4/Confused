@@ -13,21 +13,31 @@ import Confused.Application;
 import Confused.Singleton;
 import Confused.Time;
 import Confused.Renderer;
+import Confused.WindowManager;
 import Confused.Window;
+import Confused.Utils;
 
 void Confused::Application::InitializeCore()
 {
+	// Init only (doesn't require cleanup later)
 	Logger::Initialize();
-	m_pMainWindow = new Window(m_Name, 800, 600);
-	Renderer::GetInstance().Initialize(m_pMainWindow);
+	UTILS.Initialize();
+
+	Window* pMainWindow = WindowManager::CreateWin(WindowProps("Main Window"));
+
+	//------------------------------------------
+	// Initialize
+	//------------------------------------------
+	RENDERER.Initialize(pMainWindow);
 
 	CORE_LOGT("Engine started");
 }
 
 void Confused::Application::CleanupCore()
 {
-	Renderer::GetInstance().Cleanup();
-	delete m_pMainWindow;
+	RENDERER.Cleanup();
+
+	WindowManager::Cleanup();
 
 	CORE_LOGT("Engine exitted");
 	CORE_LOGT("Program stopped running, press enter to quit...");
@@ -40,8 +50,8 @@ void Confused::Application::Run()
 	InitializeCore();
 	Initialize();
 
-	auto& time = Time::GetInstance();
-	auto& renderer = Renderer::GetInstance();
+	auto& time = TIME;
+	auto& renderer = RENDERER;
 
 	bool shouldContinue = true;
 	auto lastTime = time.GetCurrent();
@@ -65,7 +75,12 @@ void Confused::Application::Run()
 		time.SetElapsed(deltaTime);
 
 		// Update
-		shouldContinue = !m_pMainWindow->Update();
+		Window* pClosedWindow = WindowManager::Update();
+		if (pClosedWindow == renderer.GetWindow())
+		{
+			shouldContinue = false; // As long as the main window exists, keep going
+			continue;
+		}
 
 		// Render
 		renderer.Render();

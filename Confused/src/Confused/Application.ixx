@@ -2,6 +2,7 @@ module;
 #include "Macros.h"
 export module Confused.Application;
 
+import Confused.WindowManager;
 import Confused.Window;
 
 #pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
@@ -13,7 +14,6 @@ namespace Confused
 	public:
 		Application(std::string name)
 			: m_Name{ std::move(name) }
-			, m_pMainWindow{ nullptr }
 		{
 
 		}
@@ -41,7 +41,6 @@ namespace Confused
 		void CleanupCore();
 
 		// Variables
-		Window* m_pMainWindow;
 		std::string m_Name;
 	};
 
