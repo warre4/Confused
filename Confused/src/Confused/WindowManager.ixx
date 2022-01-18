@@ -32,13 +32,16 @@ namespace Confused
 		}
 		static void Cleanup()
 		{
-			for (Window* pWindow : m_pWindows)
-				delete pWindow;
+			if (GetNrActiveWindows() > 0)
+			{
+				for (Window* pWindow : m_pWindows)
+					delete pWindow;
 
-			m_pWindows.clear();
+				m_pWindows.clear();
 
-			CORE_LOGI("All open windows closed.");
-			CORE_LOGI(std::to_string(GetNrActiveWindows()) + " windows open.");
+				CORE_LOGI("All open windows closed.");
+				CORE_LOGI(std::to_string(GetNrActiveWindows()) + " windows open.");
+			}
 		}
 
 		// TEMPORARY RETURN VALUE: returns what Window was closed this frame (nullptr if none)

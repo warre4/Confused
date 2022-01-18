@@ -32,13 +32,40 @@ namespace Confused
 		// Converts a pointer into a vector
 		// newT is the type of the elements (newT must have a constructor that takes T)
 		template <typename newT, typename T> requires Constructable<T, newT>
-		std::vector<newT> ToVec(T* pData, uint32_t count)
+		[[nodiscard]] std::vector<newT> ToVec(T* pData, uint32_t count)
 		{
 			std::vector<newT> newVec{ count };
 
 			for (uint32_t i = 0; i < count; i++)
 			{
 				newVec[i] = pData[i];
+			}
+
+			return std::move(newVec);
+		}
+
+		template <typename newT, typename oldT> requires Constructable<oldT, newT>
+		[[nodiscard]] std::vector<newT> ChangeType(const std::vector<oldT>& oldVec)
+		{
+			size_t count = oldVec.size();
+			std::vector<newT> newVec{ count };
+
+			for (size_t i = 0; i < count; i++)
+			{
+				newVec[i] = oldVec[i];
+			}
+
+			return std::move(newVec);
+		}
+		// !!!! WARNING: This vector becomes invalid after the original vector is destroyed !!!!
+		[[nodiscard]] std::vector<const char*> ChangeTypeToCStr(const std::vector<std::string>& oldVec)
+		{
+			size_t count = oldVec.size();
+			std::vector<const char*> newVec{ count };
+
+			for (size_t i = 0; i < count; i++)
+			{
+				newVec[i] = oldVec[i].c_str();
 			}
 
 			return std::move(newVec);

@@ -24,6 +24,7 @@ void Confused::Application::InitializeCore()
 	UTILS.Initialize();
 
 	Window* pMainWindow = WindowManager::CreateWin(WindowProps("Main Window"));
+	WindowManager::CreateWin(WindowProps(m_Name, 800, 600));
 
 	//------------------------------------------
 	// Initialize
@@ -60,7 +61,7 @@ void Confused::Application::Run()
 
 	//// Inputs
 	//std::future<void> inputs = std::async(std::launch::async, []() {
-	//	CORE_LOGT("Inputs initialized, press enter to stop the engine...");
+	//	CORE_LOGT("Press enter...");
 	//	std::cin.get();
 	//	CORE_LOGT("Input received!");
 	//	});
