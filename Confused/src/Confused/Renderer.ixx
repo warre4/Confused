@@ -23,6 +23,16 @@ import Confused.Utils;
 
 #pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
 
+struct QueueFamilyIndices
+{
+	std::optional<uint32_t> graphicsFamily;
+
+	bool IsComplete()
+	{
+		return graphicsFamily.has_value();
+	}
+};
+
 namespace Confused
 {
 	export class CONFUSED_API Renderer final : public Singleton<Renderer>
@@ -33,9 +43,9 @@ namespace Confused
 
 		void Initialize(Window* pWindow)
 		{
-			SetWindow(pWindow);
 			LOGT("Renderer initializing");
 
+			SetWindow(pWindow);
 			InitializeVulkan();
 		}
 		void Cleanup()
@@ -66,6 +76,7 @@ namespace Confused
 		{
 			CreateInstance();
 			SetupDebugMessenger();
+			PickPhysicalDevice();
 		}
 		
 		void CreateInstance()
@@ -119,6 +130,91 @@ namespace Confused
 
 			// Create instance
 			CHECK(vkCreateInstance(&createInfo, nullptr, &m_VkInstance), "vkCreateInstance failed");
+		}
+
+		void PickPhysicalDevice()
+		{
+			uint32_t deviceCount = 0;
+			CHECK(vkEnumeratePhysicalDevices(m_VkInstance, &deviceCount, nullptr), "vkEnumeratePhysicalDevices failed");
+
+			if (deviceCount == 0)
+				RTE("Failed to find GPUs with Vulkan support!");
+
+			std::vector<VkPhysicalDevice> devices{ deviceCount };
+			CHECK(vkEnumeratePhysicalDevices(m_VkInstance, &deviceCount, devices.data()), "vkEnumeratePhysicalDevices failed");
+
+			uint32_t bestScore = 0;
+			uint32_t currScore;
+			for (const auto& device : devices)
+			{
+				currScore = RateDeviceSuitability(device);
+				if (currScore > bestScore)
+				{
+					m_PhysicalDevice = device;
+					bestScore = currScore;
+				}
+			}
+
+			if (m_PhysicalDevice == VK_NULL_HANDLE)
+				RTE("failed to find a suitable GPU!");
+
+			// Log name of selected device
+			VkPhysicalDeviceProperties deviceProperties;
+			vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
+			LOGI("Vulkan will use " + STR(deviceProperties.deviceName));
+		}
+		uint32_t RateDeviceSuitability(VkPhysicalDevice device)
+		{
+			QueueFamilyIndices indices = FindQueueFamilies(device);
+
+			// Needs queue family
+			if (!indices.IsComplete())
+				return 0;
+
+			VkPhysicalDeviceProperties deviceProperties;
+			VkPhysicalDeviceFeatures deviceFeatures;
+			vkGetPhysicalDeviceProperties(device, &deviceProperties);
+			vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+			// Needs geometry shader
+			if (!deviceFeatures.geometryShader)
+				return 0;
+
+			// Generate score
+			uint32_t score = 0;
+
+			if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+				score += 4000;
+
+			score += deviceProperties.limits.maxImageDimension2D;
+
+			//LOGT(deviceProperties.deviceName + STR(" scored ") + std::to_string(score));
+
+			return score;
+		}
+		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device)
+		{
+			QueueFamilyIndices indices;
+
+			uint32_t queueFamilyCount = 0;
+			vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+			std::vector<VkQueueFamilyProperties> queueFamilies{ queueFamilyCount };
+			vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+			int i = 0;
+			for (const auto& queueFamily : queueFamilies)
+			{
+				if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+					indices.graphicsFamily = i;
+
+				if (indices.IsComplete())
+					break;
+
+				i++;
+			}
+
+			return indices;
 		}
 
 #pragma endregion Initialize
@@ -322,20 +418,19 @@ namespace Confused
 
 #pragma endregion Vulkan
 
-
-
 		// Variables
 
 		Window* m_pWindow;
-		VkInstance m_VkInstance;
 
+		VkInstance m_VkInstance;
 		VkDebugUtilsMessengerEXT m_DebugMessenger;
+		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 
 #ifdef NDEBUG
 		const bool m_EnableValidationLayers = false;
 #else
 		const bool m_EnableValidationLayers = true;
 #endif
-		const std::vector<const char*> m_ValidationLayers = { "VK_LAYER_KHRONOS_validation" };
+		const std::vector<const char*> m_ValidationLayers{ "VK_LAYER_KHRONOS_validation" };
 	};
 }

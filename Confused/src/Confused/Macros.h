@@ -30,6 +30,11 @@
 //Pointer to the logger
 #define LOGGER Confused::Logger::GetCoreLogger()
 
+//Shows info pop-up with ok button
+//Pauses program!
+#define LOGINFOBOX(message) MessageBoxA(NULL, STR(message).c_str(), "Confused", MB_ICONINFORMATION | MB_OK)
+#define LOGBOX(message, flags) MessageBoxA(NULL, STR(message).c_str(), "Confused", flags)
+
 #else
 
 //Pointer to the logger

@@ -9,14 +9,13 @@ module;
 export module Confused.Utils;
 
 // Disable logging macros (pass logger by const ref to the functions)
-
-#undef LOGGER
-#undef LOGT
-#undef LOGD
-#undef LOGI
-#undef LOGWARN
-#undef LOGERROR
-#undef LOGCRITICAL
+	#undef LOGGER
+	#undef LOGT
+	#undef LOGD
+	#undef LOGI
+	#undef LOGWARN
+	#undef LOGERROR
+	#undef LOGCRITICAL
 
 import Confused.Singleton;
 
