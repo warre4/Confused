@@ -1,11 +1,22 @@
 module;
 #include "Core.h"
+#include "Macros.h"
 
 #include <stdint.h>
 #include <string>
 #include <vector>
 #include <concepts>
 export module Confused.Utils;
+
+// Disable logging macros (pass logger by const ref to the functions)
+
+	#undef LOGGER
+	#undef LOGT
+	#undef LOGD
+	#undef LOGI
+	#undef LOGWARN
+	#undef LOGERROR
+	#undef LOGCRITICAL
 
 import Confused.Application;
 import Confused.Singleton;
@@ -18,17 +29,26 @@ namespace Confused
 	export class CONFUSED_API Utils final : public Singleton<Utils>
 	{
 	public:
+		void Initialize()
+		{
+			// Initialize random generator
+
+		}
+
+#pragma region Random
 		//// Returns a random float
-		//export float Rand(float min, float max, uint32_t precision = 2)
+		//float Rand(float min, float max, uint32_t precision = 2)
 		//{
 
 		//}
 		//// Returns a random int
-		//export int Rand(int min, int max)
+		//int Rand(int min, int max)
 		//{
 
 		//}
+#pragma endregion Random
 
+#pragma region Containers
 		// Converts a pointer into a vector
 		// newT is the type of the elements (newT must have a constructor that takes T)
 		template <typename newT, typename T> requires Constructable<T, newT>
@@ -57,25 +77,21 @@ namespace Confused
 
 			return std::move(newVec);
 		}
-		// !!!! WARNING: This vector becomes invalid after the original vector is destroyed !!!!
-		[[nodiscard]] std::vector<const char*> ChangeTypeToCStr(const std::vector<std::string>& oldVec)
+
+		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, const std::shared_ptr<spdlog::logger>& logger, spdlog::level::level_enum level = spdlog::level::debug)
 		{
-			size_t count = oldVec.size();
-			std::vector<const char*> newVec{ count };
+			logger->log(level, "");
 
-			for (size_t i = 0; i < count; i++)
-			{
-				newVec[i] = oldVec[i].c_str();
-			}
+			logger->log(level, description + "(" + std::to_string(vec.size()) + "):");
+			for (const std::string& element : vec)
+				logger->log(level, "\t" + element);
 
-			return std::move(newVec);
+			logger->log(level, "");
 		}
+#pragma endregion Containers
 
 	private:
-		friend class Singleton<Utils>;
 		Utils() = default;
-
-		friend class Application;
-		void Initialize();
+		friend class Singleton<Utils>;
 	};
 }

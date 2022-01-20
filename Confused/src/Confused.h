@@ -6,6 +6,7 @@
 #include "Confused/Macros.h"
 
 import Confused.Application;
+import Confused.Utils;
 
 //----------Entry Point----------
 #include "Confused/EntryPoint.h"

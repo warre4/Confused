@@ -18,6 +18,9 @@ private:
 	void Initialize() override
 	{
 		LOGT(GetName() + " initializing");
+
+		std::vector<std::string> vec{};
+		UTILS.PrintStrings(vec, "Vector of strings", LOGGER);
 	}
 
 	void Cleanup() override

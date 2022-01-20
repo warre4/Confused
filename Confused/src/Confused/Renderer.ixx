@@ -34,20 +34,15 @@ namespace Confused
 		void Initialize(Window* pWindow)
 		{
 			SetWindow(pWindow);
-			CORE_LOGT("Renderer initializing");
+			LOGT("Renderer initializing");
 
-			// Vulkan
-			CreateInstance();
-			SetupDebugMessenger();
+			InitializeVulkan();
 		}
 		void Cleanup()
 		{
-			CORE_LOGT("Renderer cleaning up");
+			LOGT("Renderer cleaning up");
 
-			// Vulkan
-			if (m_EnableValidationLayers)
-				DestroyDebugUtilsMessengerEXT(m_VkInstance, m_DebugMessenger, nullptr);
-			vkDestroyInstance(m_VkInstance, nullptr);
+			CleanupVulkan();
 		}
 
 		void Render() const
@@ -62,14 +57,23 @@ namespace Confused
 		inline void SetWindow(Window* pWindow) { m_pWindow = pWindow; }
 
 	private:
-		// Helpers
 
+#pragma region Vulkan
+
+#pragma region Initialize
+
+		void InitializeVulkan()
+		{
+			CreateInstance();
+			SetupDebugMessenger();
+		}
+		
 		void CreateInstance()
 		{
 			// Validation layers
 			if (m_EnableValidationLayers)
 			{
-				PrintStrings(UTILS.ChangeType<std::string>(m_ValidationLayers), "Required validation layers");
+				UTILS.PrintStrings(UTILS.ChangeType<std::string>(m_ValidationLayers), "Required validation layers", LOGGER);
 				CheckValidationLayerSupport();
 			}
 
@@ -90,8 +94,8 @@ namespace Confused
 			std::vector<const char*> requiredExtensionsCStr = GetRequiredExtensions();
 			std::vector<std::string> requiredExtensions = UTILS.ChangeType<std::string>(requiredExtensionsCStr);
 			std::vector<std::string> supportedExtensions = GetSupportedExtensions();
-			PrintStrings(requiredExtensions, "Required extensions");
-			//PrintStrings(supportedExtensions, "Supported extensions");
+			UTILS.PrintStrings(requiredExtensions, "Required extensions", LOGGER);
+			//UTILS.PrintStrings(supportedExtensions, "Supported extensions");
 			CheckExtentionSupport(supportedExtensions, requiredExtensions);
 
 			createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensionsCStr.size());
@@ -117,8 +121,21 @@ namespace Confused
 			CHECK(vkCreateInstance(&createInfo, nullptr, &m_VkInstance), "vkCreateInstance failed");
 		}
 
-#pragma region VkExtensions
-		std::vector<std::string> GetSupportedExtensions()
+#pragma endregion Initialize
+#pragma region Cleanup
+
+		void CleanupVulkan()
+		{
+			if (m_EnableValidationLayers)
+				DestroyDebugUtilsMessengerEXT(m_VkInstance, m_DebugMessenger, nullptr);
+			vkDestroyInstance(m_VkInstance, nullptr);
+		}
+
+#pragma endregion Cleanup
+
+#pragma region Extensions
+
+		[[nodiscard]] std::vector<std::string> GetSupportedExtensions()
 		{
 			uint32_t extensionCount = 0;
 			CHECK(vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr), "vkEnumerateInstanceExtensionProperties failed");
@@ -134,7 +151,7 @@ namespace Confused
 
 			return std::move(supportedExtensions);
 		}
-		std::vector<const char*> GetRequiredExtensions()
+		[[nodiscard]] std::vector<const char*> GetRequiredExtensions()
 		{
 			// GLFW
 			uint32_t glfwExtensionCount = 0;
@@ -142,7 +159,7 @@ namespace Confused
 			glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
 			if (glfwExtensions == nullptr)
-				CORE_RTE("glfwGetRequiredInstanceExtensions failed");
+				RTE("glfwGetRequiredInstanceExtensions failed");
 
 			std::vector<const char*> requiredExtensions{ glfwExtensions, glfwExtensions + glfwExtensionCount };
 			
@@ -161,18 +178,19 @@ namespace Confused
 				if (std::find(supportedExtensions.cbegin(), supportedExtensions.cend(), requiredExt) == supportedExtensions.cend())
 				{
 					isEverythingSupported = false;
-					CORE_LOGERROR("Extension not supported: " + requiredExt);
+					LOGERROR("Extension not supported: " + requiredExt);
 				}
 			}
 
 			if (isEverythingSupported)
-				CORE_LOGI("All required extensions are supported");
+				LOGI("All required extensions are supported");
 			else
-				CORE_LOGCRITICAL("Not all required extentions are supported");
+				LOGCRITICAL("Not all required extentions are supported");
 		}
-#pragma endregion VkExtensions
 
-#pragma region VkValidationLayers
+#pragma endregion Extensions
+#pragma region ValidationLayers
+
 		void CheckValidationLayerSupport() const
 		{
 			// Get supported validation layers
@@ -200,23 +218,24 @@ namespace Confused
 				if (!layerFound)
 				{
 					isEverythingSupported = false;
-					CORE_LOGERROR(STR("Validation layer not supported: ") + requiredLayerName);
+					LOGERROR(STR("Validation layer not supported: ") + requiredLayerName);
 				}
 			}
 
 			if (isEverythingSupported)
-				CORE_LOGI("All required validation layers are supported");
+				LOGI("All required validation layers are supported");
 			else
-				CORE_LOGCRITICAL("Not all required validation layers are supported");
+				LOGCRITICAL("Not all required validation layers are supported");
 		}
-#pragma endregion VkValidationLayers
 
+#pragma endregion ValidationLayers
 #pragma region DebugUtilsMessengerEXT
+
 		static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
 			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity
 			, VkDebugUtilsMessageTypeFlagsEXT messageType
 			, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData
-			, void* pUserData /*Ptr to Renderer*/)
+			, [[maybe_unused]] void* pUserData /*Ptr to Renderer*/)
 		{
 			std::string type{ string_VkDebugUtilsMessageTypeFlagsEXT(messageType) };
 			type = std::string{ &type[28], &type[type.find("_BIT_EXT")] };
@@ -227,34 +246,32 @@ namespace Confused
 			switch (messageSeverity)
 			{
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-				CORE_LOGT(header);
-				CORE_LOGT(message);
-				CORE_LOGT("");
+				LOGT(header);
+				LOGT(message);
+				LOGT("");
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-				CORE_LOGT(header);
-				CORE_LOGT(message);
-				CORE_LOGT("");
+				LOGT(header);
+				LOGT(message);
+				LOGT("");
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-				CORE_LOGERROR(header);
-				CORE_LOGERROR(message);
-				CORE_LOGERROR("");
+				LOGWARN(header);
+				LOGWARN(message);
+				LOGWARN("");
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-				CORE_LOGCRITICAL(header);
-				CORE_LOGCRITICAL(message);
-				CORE_LOGCRITICAL("");
+				LOGERROR(header);
+				LOGERROR(message);
+				LOGERROR("");
 				break;
 			default:
-				CORE_LOGCRITICAL("Unknown callback severity! Message: ");
-				CORE_LOGCRITICAL(header);
-				CORE_LOGCRITICAL(message);
-				CORE_LOGCRITICAL("");
+				LOGCRITICAL("Unknown callback severity! Message: ");
+				LOGCRITICAL(header);
+				LOGCRITICAL(message);
+				LOGCRITICAL("");
 				break;
 			}
-
-			UNREFERENCED_PARAMETER(pUserData);
 
 			return VK_FALSE;
 		}
@@ -271,7 +288,6 @@ namespace Confused
 				return VK_ERROR_EXTENSION_NOT_PRESENT;
 			}
 		}
-
 		static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
 		{
 			auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
@@ -304,16 +320,9 @@ namespace Confused
 
 #pragma endregion DebugUtilsMessengerEXT
 
-		static void PrintStrings(const std::vector<std::string>& vec, const std::string& description)
-		{
-			CORE_LOGD("");
+#pragma endregion Vulkan
 
-			CORE_LOGD(description + "(" + std::to_string(vec.size()) + "):");
-			for (const std::string& element : vec)
-				CORE_LOGD("\t" + element);
 
-			CORE_LOGD("");
-		}
 
 		// Variables
 

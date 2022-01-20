@@ -31,7 +31,7 @@ void Confused::Application::InitializeCore()
 	//------------------------------------------
 	RENDERER.Initialize(pMainWindow);
 
-	CORE_LOGT("Engine started");
+	LOGT("Engine started");
 }
 
 void Confused::Application::CleanupCore()
@@ -40,8 +40,8 @@ void Confused::Application::CleanupCore()
 
 	WindowManager::Cleanup();
 
-	CORE_LOGT("Engine exitted");
-	CORE_LOGT("Program stopped running, press enter to quit...");
+	LOGT("Engine exitted");
+	LOGT("Program stopped running, press enter to quit...");
 	std::cin.get();
 }
 
@@ -61,9 +61,9 @@ void Confused::Application::Run()
 
 	//// Inputs
 	//std::future<void> inputs = std::async(std::launch::async, []() {
-	//	CORE_LOGT("Press enter...");
+	//	LOGT("Press enter...");
 	//	std::cin.get();
-	//	CORE_LOGT("Input received!");
+	//	LOGT("Input received!");
 	//	});
 
 	// Loop
@@ -86,7 +86,7 @@ void Confused::Application::Run()
 		// Render
 		renderer.Render();
 
-		//CORE_LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
+		//LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
 	}
 
 	// Cleanup

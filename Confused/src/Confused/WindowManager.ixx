@@ -26,7 +26,7 @@ namespace Confused
 			Window* pWindow = new Window(props);
 			m_pWindows.insert(pWindow);
 
-			CORE_LOGI(std::to_string(GetNrActiveWindows()) + " windows open.");
+			LOGI(std::to_string(GetNrActiveWindows()) + " windows open.");
 
 			return pWindow;
 		}
@@ -39,8 +39,8 @@ namespace Confused
 
 				m_pWindows.clear();
 
-				CORE_LOGI("All open windows closed.");
-				CORE_LOGI(std::to_string(GetNrActiveWindows()) + " windows open.");
+				LOGI("All open windows closed.");
+				LOGI(std::to_string(GetNrActiveWindows()) + " windows open.");
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace Confused
 					if (returnValue == nullptr)
 						returnValue = element;
 					else
-						CORE_EXCEPTION("Temp fix to pass windows detected multiple windows closing in the same frame");
+						EXCEPTION("Temp fix to pass windows detected multiple windows closing in the same frame");
 
 					// Delete (and close) window
 					delete element;
@@ -79,7 +79,7 @@ namespace Confused
 			if (returnValue)
 			{
 				uint32_t nrActiveWindows = GetNrActiveWindows();
-				CORE_LOGI(std::to_string(nrActiveWindows) + " windows open.");
+				LOGI(std::to_string(nrActiveWindows) + " windows open.");
 
 				if (nrActiveWindows == 0)
 					glfwTerminate();

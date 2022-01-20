@@ -25,41 +25,44 @@
 
 // Core logging
 
-//Log trace
-#define CORE_LOGT(...)        Confused::Logger::GetCoreLogger()->trace(__VA_ARGS__)
-//Log debug
-#define CORE_LOGD(...)        Confused::Logger::GetCoreLogger()->debug(__VA_ARGS__)
-//Log info
-#define CORE_LOGI(...)        Confused::Logger::GetCoreLogger()->info(__VA_ARGS__)
-#define CORE_LOGWARNING(...)  Confused::Logger::GetCoreLogger()->warn(__VA_ARGS__)
-#define CORE_LOGERROR(...)    Confused::Logger::GetCoreLogger()->error(__VA_ARGS__)
-#define CORE_LOGCRITICAL(...) Confused::Logger::GetCoreLogger()->critical(__VA_ARGS__)
+#ifdef IS_CORE
 
+#define LOGGER Confused::Logger::GetCoreLogger()
 
-// Client logging
+#else
+
+#define LOGGER Confused::Logger::GetClientLogger()
+
+#endif
 
 //Log trace
-#define LOGT(...)             Confused::Logger::GetClientLogger()->trace(__VA_ARGS__)
+#define LOGT(...)        LOGGER->trace(__VA_ARGS__)
 //Log debug
-#define LOGD(...)             Confused::Logger::GetClientLogger()->debug(__VA_ARGS__)
+#define LOGD(...)        LOGGER->debug(__VA_ARGS__)
 //Log info
-#define LOGI(...)             Confused::Logger::GetClientLogger()->info(__VA_ARGS__)
-#define LOGWARNING(...)       Confused::Logger::GetClientLogger()->warn(__VA_ARGS__)
-#define LOGERROR(...)         Confused::Logger::GetClientLogger()->error(__VA_ARGS__)
-#define LOGCRITICAL(...)      Confused::Logger::GetClientLogger()->critical(__VA_ARGS__)
+#define LOGI(...)        LOGGER->info(__VA_ARGS__)
+#define LOGWARN(...)  LOGGER->warn(__VA_ARGS__)
+#define LOGERROR(...)    LOGGER->error(__VA_ARGS__)
+#define LOGCRITICAL(...) LOGGER->critical(__VA_ARGS__)
 
 
 // ----------------------------------------------------------------------------------------------
 // EXCEPTIONS
 // ----------------------------------------------------------------------------------------------
 
-#define EXCEPTION(message)      throw std::exception((    STR("App: ")      + message).c_str())
-#define CORE_EXCEPTION(message) throw std::exception((    STR("Confused: ") + message).c_str())
+#ifdef IS_CORE
 
-//Runtime error
-#define RTE(message)            throw std::runtime_error((STR("App: ")      + message).c_str())
-//Runtime error
-#define CORE_RTE(message)       throw std::runtime_error((STR("Confused: ") + message).c_str())
+	#define EXCEPTION(message) throw std::exception((    STR("Confused: ") + message).c_str())
+	//Runtime error
+	#define RTE(message)       throw std::runtime_error((STR("Confused: ") + message).c_str())
+
+#else
+
+	#define EXCEPTION(message)      throw std::exception((    STR("App: ") + message).c_str())
+	//Runtime error
+	#define RTE(message)            throw std::runtime_error((STR("App: ") + message).c_str())
+
+#endif
 
 
 // ----------------------------------------------------------------------------------------------
@@ -71,5 +74,5 @@
 {                                                                                               \
 	VkResult temporaryResultInMacro = vkResult;                                                 \
 	if (temporaryResultInMacro != VK_SUCCESS)                                                   \
-		CORE_RTE(STR(message) + " \nError: " + string_VkResult(temporaryResultInMacro));        \
+		RTE(STR(message) + " \nError: " + string_VkResult(temporaryResultInMacro));             \
 }

@@ -13,8 +13,8 @@ namespace Confused
 	public:
 		static void Initialize();
 
-		inline static const std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_pCoreLogger; }
-		inline static const std::shared_ptr<spdlog::logger>& GetClientLogger() { return m_pClientLogger; }
+		[[nodiscard]] inline static const std::shared_ptr<spdlog::logger>& GetCoreLogger() { return m_pCoreLogger; }
+		[[nodiscard]] inline static const std::shared_ptr<spdlog::logger>& GetClientLogger() { return m_pClientLogger; }
 
 	private:
 		static std::shared_ptr<spdlog::logger> m_pCoreLogger;
