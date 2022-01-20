@@ -76,7 +76,9 @@ namespace Confused
 		{
 			CreateInstance();
 			SetupDebugMessenger();
+
 			PickPhysicalDevice();
+			CreateLogicalDevice();
 		}
 		
 		void CreateInstance()
@@ -156,10 +158,10 @@ namespace Confused
 			}
 
 			if (m_PhysicalDevice == VK_NULL_HANDLE)
-				RTE("failed to find a suitable GPU!");
+				RTE("Failed to find a suitable GPU!");
 
 			// Log name of selected device
-			VkPhysicalDeviceProperties deviceProperties;
+			VkPhysicalDeviceProperties deviceProperties{};
 			vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
 			LOGI("Vulkan will use " + STR(deviceProperties.deviceName));
 		}
@@ -192,6 +194,7 @@ namespace Confused
 
 			return score;
 		}
+
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device)
 		{
 			QueueFamilyIndices indices;
@@ -217,11 +220,47 @@ namespace Confused
 			return indices;
 		}
 
+		void CreateLogicalDevice()
+		{
+			// Queues
+			QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
+
+			VkDeviceQueueCreateInfo queueCreateInfo{};
+			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
+			queueCreateInfo.queueCount = 1;
+
+			float queuePriority = 1.f;
+			queueCreateInfo.pQueuePriorities = &queuePriority;
+
+			// Features
+			VkPhysicalDeviceFeatures deviceFeatures{};
+
+			// Create logical device
+			VkDeviceCreateInfo createInfo{};
+			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+
+			createInfo.pQueueCreateInfos = &queueCreateInfo;
+			createInfo.queueCreateInfoCount = 1;
+
+			createInfo.pEnabledFeatures = &deviceFeatures;
+
+			createInfo.enabledExtensionCount = 0;
+
+			createInfo.enabledLayerCount = 0;
+
+			CHECK(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device), "failed to create logical device!");
+
+			vkGetDeviceQueue(m_Device, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
+		}
+
 #pragma endregion Initialize
 #pragma region Cleanup
 
 		void CleanupVulkan()
 		{
+			vkDestroyDevice(m_Device, nullptr);
+
 			if (m_EnableValidationLayers)
 				DestroyDebugUtilsMessengerEXT(m_VkInstance, m_DebugMessenger, nullptr);
 			vkDestroyInstance(m_VkInstance, nullptr);
@@ -425,6 +464,8 @@ namespace Confused
 		VkInstance m_VkInstance;
 		VkDebugUtilsMessengerEXT m_DebugMessenger;
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
+		VkDevice m_Device;
+		VkQueue m_GraphicsQueue;
 
 #ifdef NDEBUG
 		const bool m_EnableValidationLayers = false;
