@@ -56,9 +56,6 @@
     <ClCompile Include="src\Confused\Utils.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Confused\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Confused\WindowManager.ixx">
       <Filter>Source Files</Filter>
     </ClCompile>

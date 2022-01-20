@@ -10,15 +10,14 @@ export module Confused.Utils;
 
 // Disable logging macros (pass logger by const ref to the functions)
 
-	#undef LOGGER
-	#undef LOGT
-	#undef LOGD
-	#undef LOGI
-	#undef LOGWARN
-	#undef LOGERROR
-	#undef LOGCRITICAL
+#undef LOGGER
+#undef LOGT
+#undef LOGD
+#undef LOGI
+#undef LOGWARN
+#undef LOGERROR
+#undef LOGCRITICAL
 
-import Confused.Application;
 import Confused.Singleton;
 
 template <typename OldT, typename NewT>
@@ -52,7 +51,7 @@ namespace Confused
 		// Converts a pointer into a vector
 		// newT is the type of the elements (newT must have a constructor that takes T)
 		template <typename newT, typename T> requires Constructable<T, newT>
-		[[nodiscard]] std::vector<newT> ToVec(T* pData, uint32_t count)
+		[[nodiscard]] std::vector<newT> ToVec(T * pData, uint32_t count)
 		{
 			std::vector<newT> newVec{ count };
 
@@ -65,7 +64,7 @@ namespace Confused
 		}
 
 		template <typename newT, typename oldT> requires Constructable<oldT, newT>
-		[[nodiscard]] std::vector<newT> ChangeType(const std::vector<oldT>& oldVec)
+		[[nodiscard]] std::vector<newT> ChangeType(const std::vector<oldT>&oldVec)
 		{
 			size_t count = oldVec.size();
 			std::vector<newT> newVec{ count };
@@ -78,7 +77,7 @@ namespace Confused
 			return std::move(newVec);
 		}
 
-		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, const std::shared_ptr<spdlog::logger>& logger, spdlog::level::level_enum level = spdlog::level::debug)
+		void PrintStrings(const std::vector<std::string>&vec, const std::string & description, const std::shared_ptr<spdlog::logger>&logger, spdlog::level::level_enum level = spdlog::level::debug)
 		{
 			logger->log(level, "");
 

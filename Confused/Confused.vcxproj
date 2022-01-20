@@ -24,7 +24,6 @@
     <ClCompile Include="src\Confused\Renderer.ixx" />
     <ClCompile Include="src\Confused\Singleton.ixx" />
     <ClCompile Include="src\Confused\Time.ixx" />
-    <ClCompile Include="src\Confused\Utils.cpp" />
     <ClCompile Include="src\Confused\Utils.ixx" />
     <ClCompile Include="src\Confused\Window.ixx" />
     <ClCompile Include="src\Confused\WindowManager.ixx" />

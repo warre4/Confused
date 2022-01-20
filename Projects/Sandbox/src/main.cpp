@@ -19,7 +19,7 @@ private:
 	{
 		LOGT(GetName() + " initializing");
 
-		std::vector<std::string> vec{};
+		std::vector<std::string> vec{"", "Hello", "There!", "", "General", "Kenobi."};
 		UTILS.PrintStrings(vec, "Vector of strings", LOGGER);
 	}
 

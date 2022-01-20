@@ -27,10 +27,12 @@
 
 #ifdef IS_CORE
 
+//Pointer to the logger
 #define LOGGER Confused::Logger::GetCoreLogger()
 
 #else
 
+//Pointer to the logger
 #define LOGGER Confused::Logger::GetClientLogger()
 
 #endif
@@ -41,7 +43,7 @@
 #define LOGD(...)        LOGGER->debug(__VA_ARGS__)
 //Log info
 #define LOGI(...)        LOGGER->info(__VA_ARGS__)
-#define LOGWARN(...)  LOGGER->warn(__VA_ARGS__)
+#define LOGWARN(...)     LOGGER->warn(__VA_ARGS__)
 #define LOGERROR(...)    LOGGER->error(__VA_ARGS__)
 #define LOGCRITICAL(...) LOGGER->critical(__VA_ARGS__)
 
