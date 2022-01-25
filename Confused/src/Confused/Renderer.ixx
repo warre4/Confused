@@ -1,5 +1,7 @@
 module;
+#include "Core.h"
 #include "Macros.h"
+#include "Logger.h"
 
 #include <string>
 #include <cstring>
@@ -27,7 +29,7 @@ struct QueueFamilyIndices
 {
 	std::optional<uint32_t> graphicsFamily;
 
-	bool IsComplete()
+	[[nodiscard]] inline constexpr bool IsComplete() const noexcept
 	{
 		return graphicsFamily.has_value();
 	}
@@ -62,9 +64,9 @@ namespace Confused
 
 		// Getters & Setters
 
-		inline Window* GetWindow() { return m_pWindow; }
+		inline Window* GetWindow() const noexcept { return m_pWindow; }
 
-		inline void SetWindow(Window* pWindow) { m_pWindow = pWindow; }
+		inline void SetWindow(Window* pWindow) noexcept { m_pWindow = pWindow; }
 
 	private:
 

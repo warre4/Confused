@@ -2,22 +2,31 @@
 
 #pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
 
-#include "Logger.h"
+#include "Core.h" // makes sure IS_CORE is correctly defined
 
 #include <string>
 #include <stdexcept>
 
 // ----------------------------------------------------------------------------------------------
+// NAMESPACES
+// ----------------------------------------------------------------------------------------------
+
+#define _SPDLOG ::spdlog::
+#define _SPDLOG_LEVEL ::spdlog::level::
+
+#define _CONFUSED ::Confused::
+
+
+// ----------------------------------------------------------------------------------------------
 // GENERAL
 // ----------------------------------------------------------------------------------------------
 
-#define UTILS Confused::Utils::GetInstance()
-#define TIME Confused::Time::GetInstance()
-#define RENDERER Confused::Renderer::GetInstance()
+#define UTILS _CONFUSED Utils::GetInstance()
+#define TIME _CONFUSED Time::GetInstance()
+#define RENDERER _CONFUSED Renderer::GetInstance()
 
 #define STR(s) std::string(s)
 #define WSTR(ws) std::wstring(ws)
-
 
 // ----------------------------------------------------------------------------------------------
 // LOGGING
@@ -28,7 +37,7 @@
 #ifdef IS_CORE
 
 //Pointer to the logger
-#define LOGGER Confused::Logger::GetCoreLogger()
+#define LOGGER _CONFUSED Logger::GetCoreLogger()
 
 //Shows info pop-up with ok button
 //Pauses program!
@@ -38,7 +47,7 @@
 #else
 
 //Pointer to the logger
-#define LOGGER Confused::Logger::GetClientLogger()
+#define LOGGER _CONFUSED Logger::GetClientLogger()
 
 #endif
 
@@ -51,6 +60,8 @@
 #define LOGWARN(...)     LOGGER->warn(__VA_ARGS__)
 #define LOGERROR(...)    LOGGER->error(__VA_ARGS__)
 #define LOGCRITICAL(...) LOGGER->critical(__VA_ARGS__)
+
+#define LOG(level, ...) LOGGER->log(level, __VA_ARGS__)
 
 
 // ----------------------------------------------------------------------------------------------
@@ -83,3 +94,9 @@
 	if (temporaryResultInMacro != VK_SUCCESS)                                                   \
 		RTE(STR(message) + " \nError: " + string_VkResult(temporaryResultInMacro));             \
 }
+
+
+// ----------------------------------------------------------------------------------------------
+// TYPEDEFS
+// ----------------------------------------------------------------------------------------------
+

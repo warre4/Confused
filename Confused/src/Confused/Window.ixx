@@ -1,4 +1,5 @@
 module;
+#include "Logger.h"
 #include "Macros.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -44,6 +45,11 @@ namespace Confused
 			glfwDestroyWindow(m_pWindow);
 		}
 
+		Window(const Window& other) = delete;
+		Window(Window&& other) noexcept = delete;
+		Window& operator=(const Window& other) = delete;
+		Window& operator=(Window&& other) noexcept = delete;
+
 		void Update()
 		{
 			glfwPollEvents();
@@ -53,11 +59,11 @@ namespace Confused
 
 		inline bool GetShouldClose() const { return glfwWindowShouldClose(m_pWindow); }
 
-		inline GLFWwindow* GetWindow() const { return m_pWindow; }
-		inline uint32_t GetWidth() const { return m_Props.Width; }
-		inline uint32_t GetHeight() const { return m_Props.Height; }
-		inline const std::string& GetTitle() const { return m_Props.Title; }
-		inline const WindowProps& GetProperties() const { return m_Props; }
+		inline GLFWwindow* GetWindow() const noexcept { return m_pWindow; }
+		inline uint32_t GetWidth() const noexcept { return m_Props.Width; }
+		inline uint32_t GetHeight() const noexcept { return m_Props.Height; }
+		inline const std::string& GetTitle() const noexcept { return m_Props.Title; }
+		inline const WindowProps& GetProperties() const noexcept { return m_Props; }
 
 		void SetTitle(const std::string& title)
 		{

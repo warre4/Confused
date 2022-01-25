@@ -3,8 +3,8 @@
 
 namespace Confused
 {
-	std::shared_ptr<spdlog::logger> Logger::m_pCoreLogger;
-	std::shared_ptr<spdlog::logger> Logger::m_pClientLogger;
+	std::shared_ptr<_SPDLOG logger> Logger::m_pCoreLogger;
+	std::shared_ptr<_SPDLOG logger> Logger::m_pClientLogger;
 
 	void Logger::Initialize()
 	{

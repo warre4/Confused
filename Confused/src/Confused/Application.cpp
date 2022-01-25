@@ -1,6 +1,7 @@
 #pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
 
 #include "Macros.h"
+#include "Logger.h"
 
 #include <string>
 #include <iostream>
@@ -66,14 +67,18 @@ void Confused::Application::Run()
 	//	LOGT("Input received!");
 	//	});
 
+	float totalTime = 0;
+
 	// Loop
 	while (shouldContinue)
 	{
 		currentTime = time.GetCurrent();
-		deltaTime = std::chrono::duration<float, std::micro>(currentTime - lastTime).count() / std::micro::den;
-		lastTime = currentTime;
-
+		deltaTime = _CHRONO duration<float, _STD nano>(currentTime - lastTime).count() / _STD nano::den;
 		time.SetElapsed(deltaTime);
+
+		totalTime += UTILS.DurationInMilliseconds(lastTime, currentTime);
+
+		lastTime = currentTime;
 
 		// Update
 		Window* pClosedWindow = WindowManager::Update();
@@ -87,6 +92,7 @@ void Confused::Application::Run()
 		renderer.Render();
 
 		//LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
+		LOGT("Total runtime: " + std::to_string((int)totalTime) + " ms");
 	}
 
 	// Cleanup

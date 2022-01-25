@@ -1,5 +1,6 @@
 module;
 #include "Macros.h"
+#include "Logger.h"
 export module Confused.Application;
 
 import Confused.WindowManager;
@@ -23,9 +24,9 @@ namespace Confused
 		}
 
 		Application(const Application& other) = delete;
-		Application(Application&& other) = delete;
+		Application(Application&& other) noexcept = delete;
 		Application& operator=(const Application& other) = delete;
-		Application& operator=(Application&& other) = delete;
+		Application& operator=(Application&& other) noexcept = delete;
 		
 		void Run();
 

@@ -20,7 +20,7 @@ private:
 		LOGT(GetName() + " initializing");
 
 		std::vector<std::string> vec{"", "Hello", "There!", "", "General", "Kenobi."};
-		UTILS.PrintStrings(vec, "Vector of strings", LOGGER);
+		UTILS.PrintStrings(vec, "Vector of strings", LOGGER, _SPDLOG_LEVEL debug);
 	}
 
 	void Cleanup() override
