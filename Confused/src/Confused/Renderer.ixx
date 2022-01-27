@@ -158,7 +158,7 @@ namespace Confused
 
 		void CreateSurface()
 		{
-			CHECK(glfwCreateWindowSurface(m_Instance, m_pWindow->GetWindow(), nullptr, &m_Surface), "Failed to create window surface!");
+			CHECK(m_pWindow->CreateSurface(m_Instance, &m_Surface), "Failed to create window surface!");
 		}
 
 #pragma endregion Surface
@@ -422,7 +422,7 @@ namespace Confused
 				return capabilities.currentExtent;
 
 			int width, height;
-			glfwGetFramebufferSize(m_pWindow->GetWindow(), &width, &height);
+			m_pWindow->GetFramebufferSize(&width, &height);
 
 			VkExtent2D actualExtent{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 

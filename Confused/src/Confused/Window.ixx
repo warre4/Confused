@@ -56,11 +56,23 @@ namespace Confused
 			glfwPollEvents();
 		}
 
+		// Vulkan
+
+		VkResult CreateSurface(VkInstance instance, VkSurfaceKHR* pSurface, const VkAllocationCallbacks* pCallback = nullptr)
+		{
+			return glfwCreateWindowSurface(instance, m_pWindow, pCallback, pSurface);
+		}
+
+		void GetFramebufferSize(int* width, int* height)
+		{
+			glfwGetFramebufferSize(m_pWindow, width, height);
+		}
+
 		// Getters & Setters
 
 		[[nodiscard]] inline bool GetShouldClose() const { return glfwWindowShouldClose(m_pWindow); }
 
-		[[nodiscard]] inline GLFWwindow* GetWindow() const noexcept { return m_pWindow; }
+		[[nodiscard]] inline const GLFWwindow* GetWindow() const noexcept { return m_pWindow; }
 		[[nodiscard]] inline uint32_t GetWidth() const noexcept { return m_Props.Width; }
 		[[nodiscard]] inline uint32_t GetHeight() const noexcept { return m_Props.Height; }
 		[[nodiscard]] inline const std::string& GetTitle() const noexcept { return m_Props.Title; }
