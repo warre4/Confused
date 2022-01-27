@@ -23,6 +23,7 @@ namespace Confused
 			, Height{ height }
 			, IsResizable{ isResizable }
 		{
+
 		}
 	};
 
@@ -72,6 +73,7 @@ namespace Confused
 		}
 
 	private:
+
 		// Variables
 
 		GLFWwindow* m_pWindow;

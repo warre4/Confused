@@ -26,21 +26,29 @@ import Confused.Utils;
 
 #pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
 
-struct QueueFamilyIndices
-{
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	[[nodiscard]] inline constexpr bool IsComplete() const noexcept
-	{
-		return graphicsFamily.has_value() && presentFamily.has_value();
-	}
-};
-
 namespace Confused
 {
 	export class CONFUSED_API Renderer final : public Singleton<Renderer>
 	{
+	private:
+		struct QueueFamilyIndices
+		{
+			std::optional<uint32_t> graphicsFamily;
+			std::optional<uint32_t> presentFamily;
+
+			[[nodiscard]] inline constexpr bool IsComplete() const noexcept
+			{
+				return graphicsFamily.has_value() && presentFamily.has_value();
+			}
+		};
+		
+		struct SwapChainSupportDetails
+		{
+			VkSurfaceCapabilitiesKHR capabilities;
+			std::vector<VkSurfaceFormatKHR> formats;
+			std::vector<VkPresentModeKHR> presentModes;
+		};
+
 	public:
 		Renderer() = default;
 		~Renderer() = default;
@@ -88,6 +96,9 @@ namespace Confused
 			// Devices
 			PickPhysicalDevice();
 			CreateLogicalDevice();
+
+			// Swap chain
+			CreateSwapChain();
 		}
 		
 		void CreateInstance()
@@ -95,7 +106,7 @@ namespace Confused
 			// Validation layers
 			if (m_EnableValidationLayers)
 			{
-				UTILS.PrintStrings(UTILS.ChangeType<std::string>(m_ValidationLayers), "Required validation layers", LOGGER);
+				UTILS.PrintStrings(UTILS.ChangeType<std::string>(m_ValidationLayers), "Required validation layers", LOGGER, _LOGLEVEL trace);
 				CheckValidationLayerSupport();
 			}
 
@@ -116,7 +127,7 @@ namespace Confused
 			std::vector<const char*> requiredExtensionsCStr = GetRequiredExtensions();
 			std::vector<std::string> requiredExtensions = UTILS.ChangeType<std::string>(requiredExtensionsCStr);
 			std::vector<std::string> supportedExtensions = GetSupportedExtensions();
-			UTILS.PrintStrings(requiredExtensions, "Required extensions", LOGGER);
+			UTILS.PrintStrings(requiredExtensions, "Required extensions", LOGGER, _LOGLEVEL trace);
 			//UTILS.PrintStrings(supportedExtensions, "Supported extensions");
 			CheckExtentionSupport(supportedExtensions, requiredExtensions);
 
@@ -143,8 +154,20 @@ namespace Confused
 			CHECK(vkCreateInstance(&createInfo, nullptr, &m_Instance), "vkCreateInstance failed");
 		}
 
+#pragma region Surface
+
+		void CreateSurface()
+		{
+			CHECK(glfwCreateWindowSurface(m_Instance, m_pWindow->GetWindow(), nullptr, &m_Surface), "Failed to create window surface!");
+		}
+
+#pragma endregion Surface
+#pragma region Device
+
 		void PickPhysicalDevice()
 		{
+			UTILS.PrintStrings(UTILS.ChangeType<std::string>(m_DeviceExtensions), "Required device extensions", LOGGER, _LOGLEVEL trace);
+
 			uint32_t deviceCount = 0;
 			CHECK(vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr), "vkEnumeratePhysicalDevices failed");
 
@@ -169,12 +192,15 @@ namespace Confused
 			if (m_PhysicalDevice == VK_NULL_HANDLE)
 				RTE("Failed to find a suitable GPU!");
 
+
 			// Log name of selected device
 			VkPhysicalDeviceProperties deviceProperties{};
 			vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
-			LOGI("Vulkan will use " + STR(deviceProperties.deviceName));
+			const std::string deviceName{ STR(deviceProperties.deviceName) };
+			LOGD("Vulkan will use " + deviceName);
+			LOGI("All required device extensions are supported on " + deviceName);
 		}
-		// Unsuitable if return value is 0
+		// Unsuitable if return value is 0 (higher value is better)
 		[[nodiscard]] uint32_t RateDeviceSuitability(VkPhysicalDevice device) const
 		{
 			QueueFamilyIndices indices = FindQueueFamilies(device);
@@ -184,30 +210,56 @@ namespace Confused
 				return 0;
 
 			VkPhysicalDeviceProperties deviceProperties;
-			VkPhysicalDeviceFeatures deviceFeatures;
 			vkGetPhysicalDeviceProperties(device, &deviceProperties);
+			VkPhysicalDeviceFeatures deviceFeatures;
 			vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
 
 			// Needs geometry shader
 			if (!deviceFeatures.geometryShader)
 				return 0;
 
+			// Needs to support all required device extensions
+			if (!CheckDeviceExtensionSupport(device))
+				return 0;
+
+			// Needs to support compatible swap chain
+			SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device);
+
+			if (swapChainSupport.formats.empty() || swapChainSupport.presentModes.empty())
+				return 0;
+
 			// --------------------------------------------------------------------
 			// Generate score
 			// --------------------------------------------------------------------
-			uint32_t score = 0;
+			uint32_t score = deviceProperties.limits.maxImageDimension2D;
 
 			if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 				score += 10'000;
 
 			if (indices.graphicsFamily == indices.presentFamily)
-				score += 500;
-
-			score += deviceProperties.limits.maxImageDimension2D;
+				score += 1000;
 
 			//LOGT(deviceProperties.deviceName + STR(" scored ") + std::to_string(score));
 
 			return score;
+		}
+		bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const
+		{
+			// Get supported device extensions
+			uint32_t supportedExtensionCount;
+			CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &supportedExtensionCount, nullptr), "vkEnumerateDeviceExtensionProperties failed");
+
+			std::vector<VkExtensionProperties> supportedExtensions{ supportedExtensionCount };
+			CHECK(vkEnumerateDeviceExtensionProperties(device, nullptr, &supportedExtensionCount, supportedExtensions.data()), "vkEnumerateDeviceExtensionProperties failed");
+
+			// Check if all required device extensions are supported
+			std::set<std::string> requiredExtensions(m_DeviceExtensions.begin(), m_DeviceExtensions.end());
+
+			for (const auto& supportedExtension : supportedExtensions)
+				requiredExtensions.erase(supportedExtension.extensionName);
+
+			return requiredExtensions.empty();
 		}
 		[[nodiscard]] QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) const
 		{
@@ -237,8 +289,150 @@ namespace Confused
 				i++;
 			}
 
-			return indices;
+			return std::move(indices);
 		}
+
+#pragma region SwapChain
+
+		void CreateSwapChain()
+		{
+			// Choose properties
+			SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(m_PhysicalDevice);
+
+			VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
+			VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
+			VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
+
+			// Swap chain create info
+			uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1; // +1 will improve performance
+			if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
+				imageCount = swapChainSupport.capabilities.maxImageCount;
+
+			VkSwapchainCreateInfoKHR createInfo{};
+			createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+			createInfo.surface = m_Surface;
+
+			createInfo.minImageCount = imageCount;
+			createInfo.imageFormat = surfaceFormat.format;
+			createInfo.imageColorSpace = surfaceFormat.colorSpace;
+			createInfo.imageExtent = extent;
+
+			//INFO: 1  => default
+			//INFO: 1+ => stereoscopic applications (like VR)
+			createInfo.imageArrayLayers = 1;
+
+			//INFO: VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT => directly render to swapchain
+			//INFO: VK_IMAGE_USAGE_TRANSFER_DST_BIT     => allows rendering to serperate image first (needed for modifying image e.g. post-processing)
+			createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+			// Queues
+			QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
+			uint32_t queueFamilyIndices[]{ indices.graphicsFamily.value(), indices.presentFamily.value() };
+
+			if (indices.graphicsFamily != indices.presentFamily)
+			{
+				createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+				createInfo.queueFamilyIndexCount = 2;
+				createInfo.pQueueFamilyIndices = queueFamilyIndices;
+			}
+			else
+			{
+				createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+				createInfo.queueFamilyIndexCount = 0;
+				createInfo.pQueueFamilyIndices = nullptr;
+			}
+
+			//INFO: swapChainSupport.capabilities.currentTransform => no transform
+			//INFO: anything else                                  => Allows for e.g. flipping or rotating the image
+			createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+
+			createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+			createInfo.presentMode = presentMode;
+			createInfo.clipped = VK_TRUE;
+
+			createInfo.oldSwapchain = VK_NULL_HANDLE;
+
+			// Create swap chain
+			CHECK(vkCreateSwapchainKHR(m_Device, &createInfo, nullptr, &m_SwapChain), "Failed to create swap chain!");
+
+			// Adjust members
+			CHECK(vkGetSwapchainImagesKHR(m_Device, m_SwapChain, &imageCount, nullptr), "vkGetSwapchainImagesKHR failed");
+			m_SwapChainImages.resize(imageCount);
+			CHECK(vkGetSwapchainImagesKHR(m_Device, m_SwapChain, &imageCount, m_SwapChainImages.data()), "vkGetSwapchainImagesKHR failed");
+
+			m_SwapChainImageFormat = surfaceFormat.format;
+			m_SwapChainExtent = extent;
+		}
+
+		[[nodiscard]] SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device) const
+		{
+			SwapChainSupportDetails details;
+
+			// Capabilities
+			CHECK(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_Surface, &details.capabilities), "vkGetPhysicalDeviceSurfaceCapabilitiesKHR failed");
+
+			// Formats
+			uint32_t formatCount;
+			CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_Surface, &formatCount, nullptr), "vkGetPhysicalDeviceSurfaceFormatsKHR failed");
+
+			if (formatCount != 0)
+			{
+				details.formats.resize(formatCount);
+				CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_Surface, &formatCount, details.formats.data()), "vkGetPhysicalDeviceSurfaceFormatsKHR failed");
+			}
+
+			// Present modes
+			uint32_t presentModeCount;
+			CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_Surface, &presentModeCount, nullptr), "vkGetPhysicalDeviceSurfacePresentModesKHR failed");
+
+			if (presentModeCount != 0)
+			{
+				details.presentModes.resize(presentModeCount);
+				CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_Surface, &presentModeCount, details.presentModes.data()), "vkGetPhysicalDeviceSurfacePresentModesKHR failed");
+			}
+
+			return std::move(details);
+		}
+
+		[[nodiscard]] VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) const
+		{
+			for (const auto& availableFormat : availableFormats)
+			{
+				if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+				{
+					return availableFormat;
+				}
+			}
+
+			return availableFormats[0];
+		}
+		[[nodiscard]] VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) const
+		{
+			for (const auto& availablePresentMode : availablePresentModes)
+			{
+				if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+					return availablePresentMode;
+			}
+
+			return VK_PRESENT_MODE_FIFO_KHR;
+		}
+		[[nodiscard]] VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const
+		{
+			if (capabilities.currentExtent.width != UINT32_MAX)
+				return capabilities.currentExtent;
+
+			int width, height;
+			glfwGetFramebufferSize(m_pWindow->GetWindow(), &width, &height);
+
+			VkExtent2D actualExtent{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+
+			actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+			actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+			return actualExtent;
+		}
+
+#pragma endregion SwapChain
 
 		void CreateLogicalDevice()
 		{
@@ -273,7 +467,8 @@ namespace Confused
 
 			createInfo.pEnabledFeatures = &deviceFeatures;
 
-			createInfo.enabledExtensionCount = 0;
+			createInfo.enabledExtensionCount = static_cast<uint32_t>(m_DeviceExtensions.size());
+			createInfo.ppEnabledExtensionNames = m_DeviceExtensions.data();
 
 			createInfo.enabledLayerCount = 0;
 
@@ -283,11 +478,16 @@ namespace Confused
 			vkGetDeviceQueue(m_Device, indices.presentFamily.value(), 0, &m_PresentQueue);
 		}
 
+#pragma endregion Device
+
 #pragma endregion Initialize
 #pragma region Cleanup
 
 		void CleanupVulkan()
 		{
+			// Swap chain
+			vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
+
 			// Devices
 			vkDestroyDevice(m_Device, nullptr);
 
@@ -488,14 +688,6 @@ namespace Confused
 		}
 
 #pragma endregion DebugUtilsMessengerEXT
-#pragma region Surface
-
-		void CreateSurface()
-		{
-			CHECK(glfwCreateWindowSurface(m_Instance, m_pWindow->GetWindow(), nullptr, &m_Surface), "Failed to create window surface!");
-		}
-
-#pragma endregion Surface
 
 #pragma endregion Vulkan
 
@@ -521,7 +713,14 @@ namespace Confused
 		VkQueue m_GraphicsQueue;
 		VkQueue m_PresentQueue;
 
-#pragma endregion Vulkan
+		// Swap chain
+
+		VkSwapchainKHR m_SwapChain;
+		std::vector<VkImage> m_SwapChainImages;
+		VkFormat m_SwapChainImageFormat;
+		VkExtent2D m_SwapChainExtent;
+
+		// Validation layers / ...
 
 #ifdef NDEBUG
 		const bool m_EnableValidationLayers = false;
@@ -529,5 +728,8 @@ namespace Confused
 		const bool m_EnableValidationLayers = true;
 #endif
 		const std::vector<const char*> m_ValidationLayers{ "VK_LAYER_KHRONOS_validation" };
+		const std::vector<const char*> m_DeviceExtensions{ VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
+#pragma endregion Vulkan
 	};
 }

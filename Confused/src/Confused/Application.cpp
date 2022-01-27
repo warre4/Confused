@@ -22,7 +22,7 @@ void Confused::Application::InitializeCore()
 {
 	// Init only (doesn't require cleanup later)
 	Logger::Initialize();
-	UTILS.Initialize();
+	_CONFUSED Utils::Internal::Initialize(UTILS);
 
 	Window* pMainWindow = WindowManager::CreateWin(WindowProps("Main Window"));
 	WindowManager::CreateWin(WindowProps(m_Name, 800, 600));

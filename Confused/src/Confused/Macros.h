@@ -13,7 +13,7 @@
 // ----------------------------------------------------------------------------------------------
 
 #define _SPDLOG ::spdlog::
-#define _SPDLOG_LEVEL ::spdlog::level::
+#define _LOGLEVEL ::spdlog::level::
 
 #define _CONFUSED ::Confused::
 

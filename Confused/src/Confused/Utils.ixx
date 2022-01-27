@@ -25,14 +25,23 @@ concept Constructable = requires(NewT e) { e = OldT(); };
 
 namespace Confused
 {
+	class Application;
+
 	export class CONFUSED_API Utils final : public Singleton<Utils>
 	{
 	public:
-		void Initialize()
+		class Internal final
 		{
-			// Initialize random generator
+		private:
+			friend class Application;
 
-		}
+			// Initialize Utils
+			static void Initialize(Utils& utils)
+			{
+				// Initialize random generator
+				UNREFERENCED_PARAMETER(utils);
+			}
+		};
 
 #pragma region Random
 
@@ -79,7 +88,7 @@ namespace Confused
 			return std::move(newVec);
 		}
 
-		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, const std::shared_ptr<_SPDLOG logger>& logger, _SPDLOG_LEVEL level_enum level = _SPDLOG_LEVEL debug) const
+		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, const std::shared_ptr<_SPDLOG logger>& logger, _LOGLEVEL level_enum level = _LOGLEVEL debug) const
 		{
 			logger->log(level, "");
 

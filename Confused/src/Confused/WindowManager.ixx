@@ -89,7 +89,7 @@ namespace Confused
 			return returnValue;
 		}
 
-		inline static uint32_t GetNrActiveWindows() { return uint32_t(m_pWindows.size()); }
+		[[nodiscard]] inline static uint32_t GetNrActiveWindows() noexcept { return uint32_t(m_pWindows.size()); }
 
 	private:
 		static std::unordered_set<Window*> m_pWindows;
