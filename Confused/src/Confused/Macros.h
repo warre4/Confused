@@ -4,6 +4,7 @@
 
 #include "Core.h" // makes sure IS_CORE is correctly defined
 
+#include <cstdint>
 #include <string>
 #include <stdexcept>
 

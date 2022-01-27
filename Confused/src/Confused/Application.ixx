@@ -31,7 +31,7 @@ namespace Confused
 		void Run();
 
 		// Helpers
-		inline const std::string& GetName() { return m_Name; }
+		[[nodiscard]] inline const std::string& GetName() const noexcept { return m_Name; }
 
 	protected:
 		virtual void Initialize() = 0;

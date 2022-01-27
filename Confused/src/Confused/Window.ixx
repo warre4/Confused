@@ -57,13 +57,13 @@ namespace Confused
 
 		// Getters & Setters
 
-		inline bool GetShouldClose() const { return glfwWindowShouldClose(m_pWindow); }
+		[[nodiscard]] inline bool GetShouldClose() const { return glfwWindowShouldClose(m_pWindow); }
 
-		inline GLFWwindow* GetWindow() const noexcept { return m_pWindow; }
-		inline uint32_t GetWidth() const noexcept { return m_Props.Width; }
-		inline uint32_t GetHeight() const noexcept { return m_Props.Height; }
-		inline const std::string& GetTitle() const noexcept { return m_Props.Title; }
-		inline const WindowProps& GetProperties() const noexcept { return m_Props; }
+		[[nodiscard]] inline GLFWwindow* GetWindow() const noexcept { return m_pWindow; }
+		[[nodiscard]] inline uint32_t GetWidth() const noexcept { return m_Props.Width; }
+		[[nodiscard]] inline uint32_t GetHeight() const noexcept { return m_Props.Height; }
+		[[nodiscard]] inline const std::string& GetTitle() const noexcept { return m_Props.Title; }
+		[[nodiscard]] inline const WindowProps& GetProperties() const noexcept { return m_Props; }
 
 		void SetTitle(const std::string& title)
 		{

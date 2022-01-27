@@ -92,7 +92,7 @@ void Confused::Application::Run()
 		renderer.Render();
 
 		//LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
-		LOGT("Total runtime: " + std::to_string((int)totalTime) + " ms");
+		//LOGT("Total runtime: " + std::to_string((int)totalTime) + " ms");
 	}
 
 	// Cleanup

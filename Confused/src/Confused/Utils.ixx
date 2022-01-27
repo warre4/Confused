@@ -53,7 +53,7 @@ namespace Confused
 		// Converts a pointer into a vector
 		// newT is the type of the elements (newT must have a constructor that takes T)
 		template <typename newT, typename T> requires Constructable<T, newT>
-		[[nodiscard]] std::vector<newT> ToVec(T* pData, uint32_t count) noexcept
+		[[nodiscard]] std::vector<newT> ToVec(T* pData, uint32_t count) const noexcept
 		{
 			std::vector<newT> newVec{ count };
 
@@ -66,7 +66,7 @@ namespace Confused
 		}
 
 		template <typename newT, typename oldT> requires Constructable<oldT, newT>
-		[[nodiscard]] std::vector<newT> ChangeType(const std::vector<oldT>& oldVec)
+		[[nodiscard]] std::vector<newT> ChangeType(const std::vector<oldT>& oldVec) const noexcept
 		{
 			size_t count = oldVec.size();
 			std::vector<newT> newVec{ count };
@@ -79,7 +79,7 @@ namespace Confused
 			return std::move(newVec);
 		}
 
-		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, const std::shared_ptr<_SPDLOG logger>& logger, _SPDLOG_LEVEL level_enum level = _SPDLOG_LEVEL debug)
+		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, const std::shared_ptr<_SPDLOG logger>& logger, _SPDLOG_LEVEL level_enum level = _SPDLOG_LEVEL debug) const
 		{
 			logger->log(level, "");
 
@@ -93,11 +93,11 @@ namespace Confused
 #pragma endregion Containers
 #pragma region Time
 
-		inline float DurationInMilliseconds(const _CHRONO steady_clock::time_point& start, const _CHRONO steady_clock::time_point& end) const noexcept
+		[[nodiscard]] inline float DurationInMilliseconds(const _CHRONO steady_clock::time_point& start, const _CHRONO steady_clock::time_point& end) const noexcept
 		{
 			return _CHRONO duration<float, _STD nano>(end - start).count() / _STD micro::den;
 		}
-		inline float DurationInSeconds(const _CHRONO steady_clock::time_point& start, const _CHRONO steady_clock::time_point& end) const noexcept
+		[[nodiscard]] inline float DurationInSeconds(const _CHRONO steady_clock::time_point& start, const _CHRONO steady_clock::time_point& end) const noexcept
 		{
 			return _CHRONO duration<float, _STD nano>(end - start).count() / _STD nano::den;
 		}

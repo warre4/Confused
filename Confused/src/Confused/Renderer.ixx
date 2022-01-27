@@ -6,6 +6,7 @@ module;
 #include <string>
 #include <cstring>
 #include <vector>
+#include <set>
 #include <algorithm>
 
 #define GLFW_INCLUDE_VULKAN
@@ -28,10 +29,11 @@ import Confused.Utils;
 struct QueueFamilyIndices
 {
 	std::optional<uint32_t> graphicsFamily;
+	std::optional<uint32_t> presentFamily;
 
 	[[nodiscard]] inline constexpr bool IsComplete() const noexcept
 	{
-		return graphicsFamily.has_value();
+		return graphicsFamily.has_value() && presentFamily.has_value();
 	}
 };
 
@@ -76,9 +78,14 @@ namespace Confused
 
 		void InitializeVulkan()
 		{
+			// Instance
 			CreateInstance();
 			SetupDebugMessenger();
 
+			// Surface
+			CreateSurface();
+
+			// Devices
 			PickPhysicalDevice();
 			CreateLogicalDevice();
 		}
@@ -133,19 +140,19 @@ namespace Confused
 			}
 
 			// Create instance
-			CHECK(vkCreateInstance(&createInfo, nullptr, &m_VkInstance), "vkCreateInstance failed");
+			CHECK(vkCreateInstance(&createInfo, nullptr, &m_Instance), "vkCreateInstance failed");
 		}
 
 		void PickPhysicalDevice()
 		{
 			uint32_t deviceCount = 0;
-			CHECK(vkEnumeratePhysicalDevices(m_VkInstance, &deviceCount, nullptr), "vkEnumeratePhysicalDevices failed");
+			CHECK(vkEnumeratePhysicalDevices(m_Instance, &deviceCount, nullptr), "vkEnumeratePhysicalDevices failed");
 
 			if (deviceCount == 0)
 				RTE("Failed to find GPUs with Vulkan support!");
 
 			std::vector<VkPhysicalDevice> devices{ deviceCount };
-			CHECK(vkEnumeratePhysicalDevices(m_VkInstance, &deviceCount, devices.data()), "vkEnumeratePhysicalDevices failed");
+			CHECK(vkEnumeratePhysicalDevices(m_Instance, &deviceCount, devices.data()), "vkEnumeratePhysicalDevices failed");
 
 			uint32_t bestScore = 0;
 			uint32_t currScore;
@@ -167,11 +174,12 @@ namespace Confused
 			vkGetPhysicalDeviceProperties(m_PhysicalDevice, &deviceProperties);
 			LOGI("Vulkan will use " + STR(deviceProperties.deviceName));
 		}
-		uint32_t RateDeviceSuitability(VkPhysicalDevice device)
+		// Unsuitable if return value is 0
+		[[nodiscard]] uint32_t RateDeviceSuitability(VkPhysicalDevice device) const
 		{
 			QueueFamilyIndices indices = FindQueueFamilies(device);
 
-			// Needs queue family
+			// Needs queue families set
 			if (!indices.IsComplete())
 				return 0;
 
@@ -184,11 +192,16 @@ namespace Confused
 			if (!deviceFeatures.geometryShader)
 				return 0;
 
+			// --------------------------------------------------------------------
 			// Generate score
+			// --------------------------------------------------------------------
 			uint32_t score = 0;
 
 			if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-				score += 4000;
+				score += 10'000;
+
+			if (indices.graphicsFamily == indices.presentFamily)
+				score += 500;
 
 			score += deviceProperties.limits.maxImageDimension2D;
 
@@ -196,8 +209,7 @@ namespace Confused
 
 			return score;
 		}
-
-		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device)
+		[[nodiscard]] QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device) const
 		{
 			QueueFamilyIndices indices;
 
@@ -213,6 +225,12 @@ namespace Confused
 				if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 					indices.graphicsFamily = i;
 
+				VkBool32 hasPresentSupport = false;
+				CHECK(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_Surface, &hasPresentSupport), "vkGetPhysicalDeviceSurfaceSupportKHR failed");
+
+				if (hasPresentSupport)
+					indices.presentFamily = i;
+
 				if (indices.IsComplete())
 					break;
 
@@ -224,16 +242,24 @@ namespace Confused
 
 		void CreateLogicalDevice()
 		{
-			// Queues
 			QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
 
-			VkDeviceQueueCreateInfo queueCreateInfo{};
-			queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-			queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-			queueCreateInfo.queueCount = 1;
+			// Queues
+			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos{};
+			std::set<uint32_t> uniqueQueueFamilyIndices{ indices.graphicsFamily.value(), indices.presentFamily.value() };
 
-			float queuePriority = 1.f;
-			queueCreateInfo.pQueuePriorities = &queuePriority;
+			const float queuePriority = 1.f;
+			for (const uint32_t queueFamilyIndex : uniqueQueueFamilyIndices)
+			{
+				// Make CreateInfo for every Family
+				VkDeviceQueueCreateInfo queueCreateInfo{};
+				queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+				queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+				queueCreateInfo.queueCount = 1;
+				queueCreateInfo.pQueuePriorities = &queuePriority;
+
+				queueCreateInfos.push_back(queueCreateInfo);
+			}
 
 			// Features
 			VkPhysicalDeviceFeatures deviceFeatures{};
@@ -242,8 +268,8 @@ namespace Confused
 			VkDeviceCreateInfo createInfo{};
 			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-			createInfo.pQueueCreateInfos = &queueCreateInfo;
-			createInfo.queueCreateInfoCount = 1;
+			createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+			createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
 			createInfo.pEnabledFeatures = &deviceFeatures;
 
@@ -251,9 +277,10 @@ namespace Confused
 
 			createInfo.enabledLayerCount = 0;
 
-			CHECK(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device), "failed to create logical device!");
+			CHECK(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device), "Failed to create logical device!");
 
 			vkGetDeviceQueue(m_Device, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
+			vkGetDeviceQueue(m_Device, indices.presentFamily.value(), 0, &m_PresentQueue);
 		}
 
 #pragma endregion Initialize
@@ -261,11 +288,16 @@ namespace Confused
 
 		void CleanupVulkan()
 		{
+			// Devices
 			vkDestroyDevice(m_Device, nullptr);
 
+			// Surface
+			vkDestroySurfaceKHR(m_Instance, m_Surface, nullptr);
+
+			// Instance
 			if (m_EnableValidationLayers)
-				DestroyDebugUtilsMessengerEXT(m_VkInstance, m_DebugMessenger, nullptr);
-			vkDestroyInstance(m_VkInstance, nullptr);
+				DestroyDebugUtilsMessengerEXT(m_Instance, m_DebugMessenger, nullptr);
+			vkDestroyInstance(m_Instance, nullptr);
 		}
 
 #pragma endregion Cleanup
@@ -452,10 +484,18 @@ namespace Confused
 			VkDebugUtilsMessengerCreateInfoEXT createInfo;
 			PopulateDebugMessengerCreateInfo(createInfo);
 
-			CHECK(CreateDebugUtilsMessengerEXT(m_VkInstance, &createInfo, nullptr, &m_DebugMessenger), "Failed to set up debug messenger!");
+			CHECK(CreateDebugUtilsMessengerEXT(m_Instance, &createInfo, nullptr, &m_DebugMessenger), "Failed to set up debug messenger!");
 		}
 
 #pragma endregion DebugUtilsMessengerEXT
+#pragma region Surface
+
+		void CreateSurface()
+		{
+			CHECK(glfwCreateWindowSurface(m_Instance, m_pWindow->GetWindow(), nullptr, &m_Surface), "Failed to create window surface!");
+		}
+
+#pragma endregion Surface
 
 #pragma endregion Vulkan
 
@@ -463,11 +503,25 @@ namespace Confused
 
 		Window* m_pWindow;
 
-		VkInstance m_VkInstance;
+#pragma region Vulkan
+
+		// Instance
+
+		VkInstance m_Instance;
 		VkDebugUtilsMessengerEXT m_DebugMessenger;
+
+		// Surface
+
+		VkSurfaceKHR m_Surface;
+
+		// Devices
+
 		VkPhysicalDevice m_PhysicalDevice = VK_NULL_HANDLE;
 		VkDevice m_Device;
 		VkQueue m_GraphicsQueue;
+		VkQueue m_PresentQueue;
+
+#pragma endregion Vulkan
 
 #ifdef NDEBUG
 		const bool m_EnableValidationLayers = false;
