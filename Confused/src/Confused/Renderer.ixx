@@ -99,6 +99,7 @@ namespace Confused
 
 			// Swap chain
 			CreateSwapChain();
+			CreateImageViews();
 		}
 		
 		void CreateInstance()
@@ -244,7 +245,7 @@ namespace Confused
 
 			return score;
 		}
-		bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const
+		[[nodiscard]] bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const
 		{
 			// Get supported device extensions
 			uint32_t supportedExtensionCount;
@@ -432,6 +433,45 @@ namespace Confused
 			return actualExtent;
 		}
 
+		void CreateImageViews()
+		{
+			const size_t nrOfImages = m_SwapChainImages.size();
+			m_SwapChainImageViews.resize(nrOfImages);
+
+			for (size_t i = 0; i < nrOfImages; i++)
+			{
+				VkImageViewCreateInfo createInfo{};
+				createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+				createInfo.image = m_SwapChainImages[i];
+
+				//INFO: 1D texture
+				//INFO: 2D texture
+				//INFO: 3D texture
+				//INFO: Cubemap
+				createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+				createInfo.format = m_SwapChainImageFormat;
+
+				createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+				createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+				createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+				createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+				//INFO: color
+				createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				
+				//INFO: no mipmapping (for now)
+				createInfo.subresourceRange.baseMipLevel = 0;
+				createInfo.subresourceRange.levelCount = 1;
+
+				//INFO: 0  => default
+				//INFO: 0+ => e.g. stereographic (like VR)
+				createInfo.subresourceRange.baseArrayLayer = 0;
+				createInfo.subresourceRange.layerCount = 1;
+
+				CHECK(vkCreateImageView(m_Device, &createInfo, nullptr, &m_SwapChainImageViews[i]), "Failed to create image views!");
+			}
+		}
+
 #pragma endregion SwapChain
 
 		void CreateLogicalDevice()
@@ -486,6 +526,11 @@ namespace Confused
 		void CleanupVulkan()
 		{
 			// Swap chain
+			for (auto& imageView : m_SwapChainImageViews)
+			{
+				vkDestroyImageView(m_Device, imageView, nullptr);
+			}
+
 			vkDestroySwapchainKHR(m_Device, m_SwapChain, nullptr);
 
 			// Devices
@@ -719,6 +764,8 @@ namespace Confused
 		std::vector<VkImage> m_SwapChainImages;
 		VkFormat m_SwapChainImageFormat;
 		VkExtent2D m_SwapChainExtent;
+
+		std::vector<VkImageView> m_SwapChainImageViews;
 
 		// Validation layers / ...
 

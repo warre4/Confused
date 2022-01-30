@@ -62,7 +62,7 @@
 #define LOGERROR(...)    LOGGER->error(__VA_ARGS__)
 #define LOGCRITICAL(...) LOGGER->critical(__VA_ARGS__)
 
-#define LOG(level, ...) LOGGER->log(level, __VA_ARGS__)
+#define LOG(level, ...)  LOGGER->log(level, __VA_ARGS__)
 
 
 // ----------------------------------------------------------------------------------------------

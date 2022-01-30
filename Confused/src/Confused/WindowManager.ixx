@@ -27,7 +27,7 @@ namespace Confused
 			Window* pWindow = new Window(props);
 			m_pWindows.insert(pWindow);
 
-			LOGI(std::to_string(GetNrActiveWindows()) + " windows open.");
+			LOGT(std::to_string(GetNrActiveWindows()) + " windows open.");
 
 			return pWindow;
 		}
@@ -40,8 +40,8 @@ namespace Confused
 
 				m_pWindows.clear();
 
-				LOGI("All open windows closed.");
-				LOGI(std::to_string(GetNrActiveWindows()) + " windows open.");
+				LOGT("All open windows closed.");
+				LOGT(std::to_string(GetNrActiveWindows()) + " windows open.");
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace Confused
 			if (returnValue)
 			{
 				uint32_t nrActiveWindows = GetNrActiveWindows();
-				LOGI(std::to_string(nrActiveWindows) + " windows open.");
+				LOGT(std::to_string(nrActiveWindows) + " windows open.");
 
 				if (nrActiveWindows == 0)
 					glfwTerminate();

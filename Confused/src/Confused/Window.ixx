@@ -58,7 +58,7 @@ namespace Confused
 
 		// Vulkan
 
-		VkResult CreateSurface(VkInstance instance, VkSurfaceKHR* pSurface, const VkAllocationCallbacks* pCallback = nullptr)
+		[[nodiscard]] VkResult CreateSurface(VkInstance instance, VkSurfaceKHR* pSurface, const VkAllocationCallbacks* pCallback = nullptr)
 		{
 			return glfwCreateWindowSurface(instance, m_pWindow, pCallback, pSurface);
 		}

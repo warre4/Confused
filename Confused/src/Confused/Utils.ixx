@@ -5,8 +5,10 @@ module;
 
 #include <stdint.h>
 #include <string>
+#include <sstream>
 #include <vector>
 #include <concepts>
+#include <random>
 export module Confused.Utils;
 
 import Confused.Singleton;
@@ -19,6 +21,17 @@ import Confused.Singleton;
 #undef LOGWARN
 #undef LOGERROR
 #undef LOGCRITICAL
+#undef LOG
+
+// Passing logger and loglevel through a function
+// creates variables:
+//=> logger
+//=> loglevel
+#define LOGGER_ARGS(defaultLevel) [[maybe_unused]] const std::shared_ptr<_SPDLOG logger>& logger, [[maybe_unused]] _LOGLEVEL level_enum loglevel = _LOGLEVEL defaultLevel
+// uses LOGGER_ARGS to log
+#define LOG(string) logger->log(loglevel, string)
+
+constexpr float INV_RAND_MAX = 1.f / RAND_MAX;
 
 template <typename OldT, typename NewT>
 concept Constructable = requires(NewT e) { e = OldT(); };
@@ -30,31 +43,46 @@ namespace Confused
 	export class CONFUSED_API Utils final : public Singleton<Utils>
 	{
 	public:
-		class Internal final
-		{
-		private:
-			friend class Application;
-
-			// Initialize Utils
-			static void Initialize(Utils& utils)
-			{
-				// Initialize random generator
-				UNREFERENCED_PARAMETER(utils);
-			}
-		};
-
 #pragma region Random
 
-		//// Returns a random float
-		//float Rand(float min, float max, uint32_t precision = 2) noexcept
-		//{
+		// Returns a random float
+		template<typename TFloat> requires std::floating_point<TFloat>
+		[[nodiscard]] inline TFloat Rand(TFloat min, TFloat max) noexcept
+		{
+			return std::uniform_real_distribution<TFloat>{ min, max }(m_RandomGenerator);
+		}
+		// Returns a random int
+		template<typename TInt> requires std::integral<TInt>
+		[[nodiscard]] inline TInt Rand(TInt min, TInt max) noexcept
+		{
+			return std::uniform_int_distribution<TInt>{ min, max }(m_RandomGenerator);
+		}
 
-		//}
-		//// Returns a random int
-		//int Rand(int min, int max) noexcept
-		//{
+		// Test random
+		void TestRandomNumbers(LOGGER_ARGS(info))
+		{
+		#ifndef NDEBUG // Only works in debug
+			// Test random
+			LOG("Testing random generator");
+			int nrloops{ 100 };
 
-		//}
+			int minI{ 0 }, maxI{ 100 };
+			LOG("int (" + std::to_string(minI) + ", " + std::to_string(maxI) + "):");
+			for (int i = 0; i < nrloops; i++)
+			{
+				LOG('\t' + std::to_string(Rand(minI, maxI)));
+			}
+			LOG("");
+
+			float minF{ 15.f }, maxF{ 15.2f };
+			LOG("float (" + std::to_string(minF) + ", " + std::to_string(maxF) + "):");
+			for (int i = 0; i < nrloops; i++)
+			{
+				LOG('\t' + std::to_string(Rand(minF, maxF)));
+			}
+			LOG("");
+		#endif
+		}
 
 #pragma endregion Random
 #pragma region Containers
@@ -88,15 +116,15 @@ namespace Confused
 			return std::move(newVec);
 		}
 
-		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, const std::shared_ptr<_SPDLOG logger>& logger, _LOGLEVEL level_enum level = _LOGLEVEL debug) const
+		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, LOGGER_ARGS(debug)) const
 		{
-			logger->log(level, "");
+			LOG("");
 
-			logger->log(level, description + "(" + std::to_string(vec.size()) + "):");
+			LOG(description + "(" + std::to_string(vec.size()) + "):");
 			for (const std::string& element : vec)
-				logger->log(level, "\t" + element);
+				LOG("\t" + element);
 
-			logger->log(level, "");
+			LOG("");
 		}
 
 #pragma endregion Containers
@@ -114,7 +142,17 @@ namespace Confused
 #pragma endregion Time
 
 	private:
-		Utils() = default;
+		friend class Internal;
 		friend class Singleton<Utils>;
+
+		Utils()
+			// Initialize random generator
+			: Singleton<Utils>()
+			, m_RandomGenerator{ std::random_device{}() }
+		{
+
+		}
+
+		std::mt19937 m_RandomGenerator;
 	};
 }
