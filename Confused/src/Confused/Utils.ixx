@@ -9,6 +9,7 @@ module;
 #include <vector>
 #include <concepts>
 #include <random>
+#include <fstream>
 export module Confused.Utils;
 
 import Confused.Singleton;
@@ -31,7 +32,7 @@ import Confused.Singleton;
 // uses LOGGER_ARGS to log
 #define LOG(string) logger->log(loglevel, string)
 
-constexpr float INV_RAND_MAX = 1.f / RAND_MAX;
+#define RESOURCE_LOCATION "Resources/"
 
 template <typename OldT, typename NewT>
 concept Constructable = requires(NewT e) { e = OldT(); };
@@ -99,7 +100,7 @@ namespace Confused
 				newVec[i] = pData[i];
 			}
 
-			return std::move(newVec);
+			return newVec;
 		}
 
 		template <typename newT, typename oldT> requires Constructable<oldT, newT>
@@ -113,7 +114,7 @@ namespace Confused
 				newVec[i] = oldVec[i];
 			}
 
-			return std::move(newVec);
+			return newVec;
 		}
 
 		void PrintStrings(const std::vector<std::string>& vec, const std::string& description, LOGGER_ARGS(debug)) const
@@ -140,6 +141,27 @@ namespace Confused
 		}
 
 #pragma endregion Time
+#pragma region Files
+
+		[[nodiscard]] std::vector<Byte> ReadFile(const std::string& fileName, const std::string& resourceLocation = "Resources/") const
+		{
+			std::ifstream file{ resourceLocation + fileName, std::ios::ate | std::ios::binary};
+
+			if (!file.is_open())
+				RTE("failed to open file! \n" + resourceLocation + fileName);
+
+			const size_t fileSize = (size_t)file.tellg();
+			std::vector<Byte> buffer(fileSize);
+
+			file.seekg(0);
+			file.read(reinterpret_cast<char*>(buffer.data()), fileSize);
+
+			file.close();
+
+			return buffer;
+		}
+
+#pragma region Files
 
 	private:
 		friend class Internal;

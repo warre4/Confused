@@ -56,8 +56,8 @@ namespace Confused
 		void Initialize(Window* pWindow)
 		{
 			LOGT("Renderer initializing");
-
 			SetWindow(pWindow);
+
 			InitializeVulkan();
 		}
 		void Cleanup()
@@ -100,6 +100,9 @@ namespace Confused
 			// Swap chain
 			CreateSwapChain();
 			CreateImageViews();
+
+			// Graphics pipeline
+			CreateGraphicsPipeline();
 		}
 		
 		void CreateInstance()
@@ -293,6 +296,51 @@ namespace Confused
 			return std::move(indices);
 		}
 
+		void CreateLogicalDevice()
+		{
+			QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
+
+			// Queues
+			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos{};
+			std::set<uint32_t> uniqueQueueFamilyIndices{ indices.graphicsFamily.value(), indices.presentFamily.value() };
+
+			const float queuePriority = 1.f;
+			for (const uint32_t queueFamilyIndex : uniqueQueueFamilyIndices)
+			{
+				// Make CreateInfo for every Family
+				VkDeviceQueueCreateInfo queueCreateInfo{};
+				queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+				queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
+				queueCreateInfo.queueCount = 1;
+				queueCreateInfo.pQueuePriorities = &queuePriority;
+
+				queueCreateInfos.push_back(queueCreateInfo);
+			}
+
+			// Features
+			VkPhysicalDeviceFeatures deviceFeatures{};
+
+			// Create logical device
+			VkDeviceCreateInfo createInfo{};
+			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+
+			createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+			createInfo.pQueueCreateInfos = queueCreateInfos.data();
+
+			createInfo.pEnabledFeatures = &deviceFeatures;
+
+			createInfo.enabledExtensionCount = static_cast<uint32_t>(m_DeviceExtensions.size());
+			createInfo.ppEnabledExtensionNames = m_DeviceExtensions.data();
+
+			createInfo.enabledLayerCount = 0;
+
+			CHECK(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device), "Failed to create logical device!");
+
+			vkGetDeviceQueue(m_Device, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
+			vkGetDeviceQueue(m_Device, indices.presentFamily.value(), 0, &m_PresentQueue);
+		}
+
+#pragma endregion Device
 #pragma region SwapChain
 
 		void CreateSwapChain()
@@ -458,7 +506,7 @@ namespace Confused
 
 				//INFO: color
 				createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-				
+
 				//INFO: no mipmapping (for now)
 				createInfo.subresourceRange.baseMipLevel = 0;
 				createInfo.subresourceRange.levelCount = 1;
@@ -473,52 +521,48 @@ namespace Confused
 		}
 
 #pragma endregion SwapChain
+#pragma region GraphicsPipeline
 
-		void CreateLogicalDevice()
+		void CreateGraphicsPipeline()
 		{
-			QueueFamilyIndices indices = FindQueueFamilies(m_PhysicalDevice);
+			auto vertShaderCode = UTILS.ReadFile("Shaders/testshaderV.spv");
+			auto fragShaderCode = UTILS.ReadFile("Shaders/testshaderF.spv");
 
-			// Queues
-			std::vector<VkDeviceQueueCreateInfo> queueCreateInfos{};
-			std::set<uint32_t> uniqueQueueFamilyIndices{ indices.graphicsFamily.value(), indices.presentFamily.value() };
+			VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
+			VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
 
-			const float queuePriority = 1.f;
-			for (const uint32_t queueFamilyIndex : uniqueQueueFamilyIndices)
-			{
-				// Make CreateInfo for every Family
-				VkDeviceQueueCreateInfo queueCreateInfo{};
-				queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-				queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
-				queueCreateInfo.queueCount = 1;
-				queueCreateInfo.pQueuePriorities = &queuePriority;
+			VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+			vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+			vertShaderStageInfo.module = vertShaderModule;
+			vertShaderStageInfo.pName = "main";
 
-				queueCreateInfos.push_back(queueCreateInfo);
-			}
+			VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
+			fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+			fragShaderStageInfo.module = fragShaderModule;
+			fragShaderStageInfo.pName = "main";
 
-			// Features
-			VkPhysicalDeviceFeatures deviceFeatures{};
+			VkPipelineShaderStageCreateInfo shaderStages[]{ vertShaderStageInfo, fragShaderStageInfo };
 
-			// Create logical device
-			VkDeviceCreateInfo createInfo{};
-			createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
-			createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-			createInfo.pQueueCreateInfos = queueCreateInfos.data();
-
-			createInfo.pEnabledFeatures = &deviceFeatures;
-
-			createInfo.enabledExtensionCount = static_cast<uint32_t>(m_DeviceExtensions.size());
-			createInfo.ppEnabledExtensionNames = m_DeviceExtensions.data();
-
-			createInfo.enabledLayerCount = 0;
-
-			CHECK(vkCreateDevice(m_PhysicalDevice, &createInfo, nullptr, &m_Device), "Failed to create logical device!");
-
-			vkGetDeviceQueue(m_Device, indices.graphicsFamily.value(), 0, &m_GraphicsQueue);
-			vkGetDeviceQueue(m_Device, indices.presentFamily.value(), 0, &m_PresentQueue);
+			vkDestroyShaderModule(m_Device, fragShaderModule, nullptr);
+			vkDestroyShaderModule(m_Device, vertShaderModule, nullptr);
 		}
 
-#pragma endregion Device
+		VkShaderModule CreateShaderModule(const std::vector<Byte>& code)
+		{
+			VkShaderModuleCreateInfo createInfo{};
+			createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+			createInfo.codeSize = code.size();
+			createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+			VkShaderModule shaderModule;
+			CHECK(vkCreateShaderModule(m_Device, &createInfo, nullptr, &shaderModule), "failed to create shader module!");
+
+			return shaderModule;
+		}
+
+#pragma endregion GraphicsPipeline
 
 #pragma endregion Initialize
 #pragma region Cleanup

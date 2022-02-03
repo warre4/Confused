@@ -1,5 +1,7 @@
 @echo off
 
+setlocal enabledelayedexpansion
+
 rem Variables
 set Configuration=%1
 set SolutionDir=%2
@@ -12,14 +14,24 @@ echo SolutionDir: %SolutionDir%
 echo OutDir: %OutDir%
 echo EngineName: %EngineName%
 
-rem Copy nessecary files to the output directory
-
-rem Engine .dll
+rem Copy Engine .dll
 copy /y %OutDir%..\%EngineName%\* %OutDir%
 
-rem Third party files
+rem Copy Third party files
 if !%Configuration%! == !Debug! copy /y %ThirdPartyDir%vld\* %OutDir%
 
 copy /y %ThirdPartyDir%SDL2\lib\* %OutDir%
 copy /y %ThirdPartyDir%glfw-3.3.6\lib\* %OutDir%
 copy /y %ThirdPartyDir%vulkan\* %OutDir%
+
+rem Copy Resources
+xcopy /y %SolutionDir%Resources %OutDir%Resources\ /e /exclude:%SolutionDir%ExcludeResources.txt
+
+rem Compile glsl shaders to SPIR-V
+for /r %SolutionDir%Resources\Shaders\ %%f in (*.vert) do D:\dev\Vulkan\Bin\glslc.exe %%f -o %%~dpnf%V.spv
+for /r %SolutionDir%Resources\Shaders\ %%f in (*.frag) do D:\dev\Vulkan\Bin\glslc.exe %%f -o %%~dpnf%F.spv
+
+rem Move all .spv files to Output
+mkdir %OutDir%Resources\Shaders\
+xcopy /y %SolutionDir%Resources\Shaders\*.spv %OutDir%Resources\Shaders\ /s
+for /r %SolutionDir%Resources\Shaders\ %%f in (*.spv) do del %%f
