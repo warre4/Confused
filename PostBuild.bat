@@ -27,11 +27,5 @@ copy /y %ThirdPartyDir%vulkan\* %OutDir%
 rem Copy Resources
 xcopy /y %SolutionDir%Resources %OutDir%Resources\ /e /exclude:%SolutionDir%ExcludeResources.txt
 
-rem Compile glsl shaders to SPIR-V
-for /r %SolutionDir%Resources\Shaders\ %%f in (*.vert) do D:\dev\Vulkan\Bin\glslc.exe %%f -o %%~dpnf%V.spv
-for /r %SolutionDir%Resources\Shaders\ %%f in (*.frag) do D:\dev\Vulkan\Bin\glslc.exe %%f -o %%~dpnf%F.spv
-
-rem Move all .spv files to Output
-mkdir %OutDir%Resources\Shaders\
-xcopy /y %SolutionDir%Resources\Shaders\*.spv %OutDir%Resources\Shaders\ /s
-for /r %SolutionDir%Resources\Shaders\ %%f in (*.spv) do del %%f
+rem Compile glsl shaders to SPIR-V (and move them to output directory)
+%SolutionDir%Resources\Shaders\compileShaders.bat %OutDir%
