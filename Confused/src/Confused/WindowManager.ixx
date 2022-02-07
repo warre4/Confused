@@ -1,7 +1,6 @@
 module;
-#include "Core.h"
 #include "Logger.h"
-#include "Macros.h"
+#include "General.h"
 
 #include <unordered_set>
 #include <algorithm>

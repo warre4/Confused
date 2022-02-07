@@ -15,7 +15,7 @@
     <ClInclude Include="src\Confused\Core.h" />
     <ClInclude Include="src\Confused\EntryPoint.h" />
     <ClInclude Include="src\Confused\Logger.h" />
-    <ClInclude Include="src\Confused\Macros.h" />
+    <ClInclude Include="src\Confused\General.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Confused\Application.cpp" />

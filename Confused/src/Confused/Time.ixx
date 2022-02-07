@@ -1,6 +1,5 @@
 module;
-#include "Core.h"
-#include "Macros.h"
+#include "General.h"
 #include <chrono>
 #include <iostream>
 export module Confused.Time;

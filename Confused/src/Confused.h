@@ -4,7 +4,7 @@
 
 // For use by Confused applications
 #include "Confused/Logger.h"
-#include "Confused/Macros.h"
+#include "Confused/General.h"
 
 import Confused.Application;
 import Confused.Utils;

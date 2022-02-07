@@ -1,5 +1,5 @@
 module;
-#include "Macros.h"
+#include "General.h"
 #include "Logger.h"
 export module Confused.Application;
 

@@ -1,8 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "Core.h"
-#include "Macros.h"
+#include "General.h"
 #include "spdlog/spdlog.h"
 
 #pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class

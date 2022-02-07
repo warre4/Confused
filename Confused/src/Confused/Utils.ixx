@@ -1,7 +1,7 @@
 module;
 #include "Core.h"
 #include "Logger.h"
-#include "Macros.h"
+#include "General.h"
 
 #include <stdint.h>
 #include <string>

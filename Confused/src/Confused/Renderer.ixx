@@ -1,6 +1,5 @@
 module;
-#include "Core.h"
-#include "Macros.h"
+#include "General.h"
 #include "Logger.h"
 
 #include <string>
