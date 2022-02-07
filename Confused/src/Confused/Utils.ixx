@@ -1,6 +1,4 @@
 module;
-#include "Core.h"
-#include "Logger.h"
 #include "General.h"
 
 #include <stdint.h>

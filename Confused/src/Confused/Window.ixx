@@ -1,5 +1,4 @@
 module;
-#include "Logger.h"
 #include "General.h"
 
 #define GLFW_INCLUDE_VULKAN

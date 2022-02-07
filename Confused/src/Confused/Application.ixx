@@ -1,6 +1,5 @@
 module;
 #include "General.h"
-#include "Logger.h"
 export module Confused.Application;
 
 import Confused.WindowManager;

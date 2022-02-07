@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include "General.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace Confused

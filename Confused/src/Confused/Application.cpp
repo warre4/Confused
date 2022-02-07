@@ -1,6 +1,5 @@
 #pragma warning( disable : 4251 ) // needs to have dll-interface to be used by clients of class
 
-#include "Logger.h"
 #include "General.h"
 
 #include <string>

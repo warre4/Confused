@@ -8,6 +8,8 @@
 #include <string>
 #include <stdexcept>
 
+#include "Logger.h"
+
 extern constexpr char ENGINE_NAME[] = "Confused";
 extern constexpr char ENGINE_INITIALS[] = "CF";
 
