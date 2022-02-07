@@ -21,7 +21,7 @@ import Confused.Utils;
 void Confused::Application::InitializeCore()
 {
 	// Init only (doesn't require cleanup later)
-	Logger::Initialize();
+	Logger::Initialize(m_Name);
 
 	Window* pMainWindow = WindowManager::CreateWin(WindowProps("Main Window"));
 	WindowManager::CreateWin(WindowProps(m_Name, 800, 600));
@@ -72,7 +72,7 @@ void Confused::Application::Run()
 	while (shouldContinue)
 	{
 		currentTime = time.GetCurrent();
-		deltaTime = _CHRONO duration<float, _STD nano>(currentTime - lastTime).count() / _STD nano::den;
+		deltaTime = _CHRONO duration<float, _CHRONO seconds::period>(currentTime - lastTime).count();
 		time.SetElapsed(deltaTime);
 
 		totalTime += UTILS.DurationInMilliseconds(lastTime, currentTime);
@@ -91,7 +91,7 @@ void Confused::Application::Run()
 		renderer.Render();
 
 		//LOGT("FPS: " + std::to_string(int(1.f / deltaTime)));
-		//LOGT("Total runtime: " + std::to_string((int)totalTime) + " ms");
+		LOGT("Total runtime: " + std::to_string((int)totalTime) + " ms");
 	}
 
 	// Cleanup

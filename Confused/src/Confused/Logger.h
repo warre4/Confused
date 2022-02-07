@@ -12,7 +12,7 @@ namespace Confused
 	class CONFUSED_API Logger
 	{
 	public:
-		static void Initialize();
+		static void Initialize(const std::string& appName);
 
 		[[nodiscard]] inline static const std::shared_ptr<_SPDLOG logger>& GetCoreLogger() noexcept { return m_pCoreLogger; }
 		[[nodiscard]] inline static const std::shared_ptr<_SPDLOG logger>& GetClientLogger() noexcept { return m_pClientLogger; }

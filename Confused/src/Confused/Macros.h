@@ -8,6 +8,9 @@
 #include <string>
 #include <stdexcept>
 
+extern constexpr char ENGINE_NAME[] = "Confused";
+extern constexpr char ENGINE_INITIALS[] = "CF";
+
 // ----------------------------------------------------------------------------------------------
 // NAMESPACES
 // ----------------------------------------------------------------------------------------------
@@ -42,8 +45,8 @@
 
 //Shows info pop-up with ok button
 //Pauses program!
-#define LOGINFOBOX(message) MessageBoxA(NULL, STR(message).c_str(), "Confused", MB_ICONINFORMATION | MB_OK)
-#define LOGBOX(message, flags) MessageBoxA(NULL, STR(message).c_str(), "Confused", flags)
+#define LOGINFOBOX(message) MessageBoxA(NULL, STR(message).c_str(), ENGINE_NAME, MB_ICONINFORMATION | MB_OK)
+#define LOGBOX(message, flags) MessageBoxA(NULL, STR(message).c_str(), ENGINE_NAME, flags)
 
 #else
 
@@ -102,3 +105,38 @@
 // ----------------------------------------------------------------------------------------------
 
 typedef unsigned char Byte;
+
+
+// ----------------------------------------------------------------------------------------------
+// ENUMS
+// ----------------------------------------------------------------------------------------------
+
+namespace Confused
+{
+	// Decides order of rendering (and how it gets rendered?)
+	enum Layer : uint8_t
+	{
+		// HUD
+		LAYER_HUD_START_IDX,
+		LAYER_HUD_0,
+		LAYER_HUD_1,
+
+		// Particle
+		LAYER_PARTICLE_START_IDX,
+		LAYER_PARTICLE_0,
+
+		// Normal
+		LAYER_NORMAL_START_IDX,
+		LAYER_NORMAL_0,
+		LAYER_NORMAL_1,
+
+		// ...
+
+		// Debug (collision wireframes, ...)
+		LAYER_DEBUG_START_IDX,
+		LAYER_DEBUG_0,
+		LAYER_DEBUG_1,
+		LAYER_DEBUG_2,
+		LAYER_DEBUG_3
+	};
+}

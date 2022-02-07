@@ -143,12 +143,12 @@ namespace Confused
 #pragma endregion Time
 #pragma region Files
 
-		[[nodiscard]] std::vector<Byte> ReadFile(const std::string& fileName, const std::string& resourceLocation = "Resources/") const
+		[[nodiscard]] std::vector<Byte> ReadFile(const std::string& fileName) const
 		{
-			std::ifstream file{ resourceLocation + fileName, std::ios::ate | std::ios::binary};
+			std::ifstream file{ RESOURCE_LOCATION + fileName, std::ios::ate | std::ios::binary};
 
 			if (!file.is_open())
-				RTE("failed to open file! \n" + resourceLocation + fileName);
+				RTE("failed to open file! \n" + RESOURCE_LOCATION + fileName);
 
 			const size_t fileSize = (size_t)file.tellg();
 			std::vector<Byte> buffer(fileSize);
@@ -161,7 +161,39 @@ namespace Confused
 			return buffer;
 		}
 
-#pragma region Files
+#pragma endregion Files
+#pragma region Enums
+
+		std::string ToString(const Layer layer)
+		{
+			switch (layer)
+			{
+				// HUD
+			case LAYER_HUD_0:		return "LAYER_HUD_0";
+			case LAYER_HUD_1:		return "LAYER_HUD_1";
+
+				// Particle
+			case LAYER_PARTICLE_0:	return "LAYER_PARTICLE_0";
+
+				// Normal
+			case LAYER_NORMAL_0:	return "LAYER_NORMAL_0";
+			case LAYER_NORMAL_1:	return "LAYER_NORMAL_1";
+
+				// ...
+
+
+				// Debug
+			case LAYER_DEBUG_0:		return "LAYER_DEBUG_0";
+			case LAYER_DEBUG_1:		return "LAYER_DEBUG_1";
+			case LAYER_DEBUG_2:		return "LAYER_DEBUG_2";
+			case LAYER_DEBUG_3:		return "LAYER_DEBUG_3";
+
+				// Not implemented
+			default: return "UNKNOWN_LAYER(error-not-implemented)";
+			}
+		}
+
+#pragma endregion Enums
 
 	private:
 		friend class Internal;
