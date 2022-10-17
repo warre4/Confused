@@ -13,5 +13,18 @@ import Confused.Utils;
 #include "Confused/EntryPoint.h"
 //-------------------------------
 
-#define APPLICATION_BEGIN(applicationName) class applicationName final : public _CONFUSED Application {
-#define APPLICATION_END(applicationName) }; _CONFUSED Application* Confused::CreateApplication() { return new applicationName(); }
+// Start class and define constructors
+#define CREATE_APPLICATION(appName, appNameStr)					\
+class appName final : public _CF Application					\
+{																\
+	public:														\
+		appName() : Confused::Application(appNameStr) {}		\
+		~appName() {}											\
+	private:													\
+		void Initialize() override;								\
+		void Cleanup() override;								\
+};																\
+_CF Application* Confused::CreateApplication()					\
+{																\
+	return new appName();										\
+}

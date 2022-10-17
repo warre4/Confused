@@ -121,7 +121,7 @@ namespace Confused
 
 			LOG(description + "(" + std::to_string(vec.size()) + "):");
 			for (const std::string& element : vec)
-				LOG("\t" + element);
+				LOG("| " + element);
 
 			LOG("");
 		}

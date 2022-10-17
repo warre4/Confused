@@ -20,16 +20,16 @@ extern constexpr char ENGINE_INITIALS[] = "CF";
 #define _SPDLOG ::spdlog::
 #define _LOGLEVEL ::spdlog::level::
 
-#define _CONFUSED ::Confused::
+#define _CF ::Confused::
 
 
 // ----------------------------------------------------------------------------------------------
 // GENERAL
 // ----------------------------------------------------------------------------------------------
 
-#define UTILS _CONFUSED Utils::GetInstance()
-#define TIME _CONFUSED Time::GetInstance()
-#define RENDERER _CONFUSED Renderer::GetInstance()
+#define UTILS _CF Utils::GetInstance()
+#define TIME _CF Time::GetInstance()
+#define RENDERER _CF Renderer::GetInstance()
 
 #define STR(s) std::string(s)
 #define WSTR(ws) std::wstring(ws)
@@ -43,7 +43,7 @@ extern constexpr char ENGINE_INITIALS[] = "CF";
 #ifdef IS_CORE
 
 //Pointer to the logger
-#define LOGGER _CONFUSED Logger::GetCoreLogger()
+#define LOGGER _CF Logger::GetCoreLogger()
 
 //Shows info pop-up with ok button
 //Pauses program!
@@ -53,7 +53,7 @@ extern constexpr char ENGINE_INITIALS[] = "CF";
 #else
 
 //Pointer to the logger
-#define LOGGER _CONFUSED Logger::GetClientLogger()
+#define LOGGER _CF Logger::GetClientLogger()
 
 #endif
 
